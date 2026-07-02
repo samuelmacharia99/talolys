@@ -1,0 +1,25 @@
+# Laravel core
+core/vendor/
+core/node_modules/
+core/.env
+core/.env.*
+!core/.env.example
+core/.phpunit.cache
+core/.phpunit.result.cache
+core/public/build/
+core/public/hot/
+core/public/storage/
+core/storage/*.key
+core/database/*.sqlite*
+core/bootstrap/cache/*.php
+!core/bootstrap/cache/.gitignore
+
+# IDE / OS
+.idea/
+.vscode/
+.fleet/
+.DS_Store
+Thumbs.db
+
+# Logs
+core/storage/logs/*.log

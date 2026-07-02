@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Concerns\BelongsToTenant;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Frontend extends Model
+{
+    use BelongsToTenant;
+    protected $casts = [
+        'data_values' => 'object',
+        'seo_content' => 'object'
+    ];
+
+    public static function scopeGetContent($data_keys)
+    {
+        return Frontend::where('data_keys', $data_keys);
+    }
+
+    public function scopeActiveTemplate($query)
+    {
+        return $query->where('tempname', activeTemplateName());
+    }
+}

@@ -139,12 +139,28 @@ class GeneralSettingController extends Controller {
             'logo_dark' => ['image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
             'favicon'   => ['image', new FileTypeValidate(['png'])],
         ]);
+
+        if (!extension_loaded('gd')) {
+            $notify[] = ['error', 'PHP GD extension is required for image uploads. Install it with: apt-get install php-gd'];
+            return back()->withNotify($notify);
+        }
+
         $path = getFilePath('logoIcon');
+
+        if (!is_dir($path)) {
+            @mkdir($path, 0755, true);
+        }
+
+        if (!is_writable($path)) {
+            $notify[] = ['error', 'Upload directory is not writable: ' . $path . '. Run: chmod -R 775 assets/'];
+            return back()->withNotify($notify);
+        }
+
         if ($request->hasFile('logo')) {
             try {
                 fileUploader($request->logo, $path, filename: 'logo.png');
             } catch (\Exception $exp) {
-                $notify[] = ['error', 'Couldn\'t upload the logo'];
+                $notify[] = ['error', 'Couldn\'t upload the logo: ' . $exp->getMessage()];
                 return back()->withNotify($notify);
             }
         }
@@ -153,7 +169,7 @@ class GeneralSettingController extends Controller {
             try {
                 fileUploader($request->logo_dark, $path, filename: 'logo_dark.png');
             } catch (\Exception $exp) {
-                $notify[] = ['error', 'Couldn\'t upload the logo'];
+                $notify[] = ['error', 'Couldn\'t upload the dark logo: ' . $exp->getMessage()];
                 return back()->withNotify($notify);
             }
         }
@@ -162,7 +178,7 @@ class GeneralSettingController extends Controller {
             try {
                 fileUploader($request->favicon, $path, filename: 'favicon.png');
             } catch (\Exception $exp) {
-                $notify[] = ['error', 'Couldn\'t upload the favicon'];
+                $notify[] = ['error', 'Couldn\'t upload the favicon: ' . $exp->getMessage()];
                 return back()->withNotify($notify);
             }
         }

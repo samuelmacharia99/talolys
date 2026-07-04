@@ -39,23 +39,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-
-        if (!cache()->get('SystemInstalled')) {
-            $envFilePath = base_path('.env');
-            if (!file_exists($envFilePath)) {
-                header('Location: install');
-                exit;
-            }
-            $envContents = file_get_contents($envFilePath);
-            if (empty($envContents)) {
-                header('Location: install');
-                exit;
-            } else {
-                cache()->put('SystemInstalled', true);
-            }
-        }
-
         $viewShare['emptyMessage'] = 'Data not found';
         view()->share($viewShare);
 
@@ -75,7 +58,6 @@ class AppServiceProvider extends ServiceProvider
                 'lateInstallmentLoanCount'   => Loan::due()->count(),
                 'pendingLoanCount'           => Loan::pending()->count(),
                 'pendingTransferCount'       => BalanceTransfer::pending()->count(),
-                'updateAvailable'            => version_compare(gs('available_version'), systemDetails()['version'], '>') ? 'v' . gs('available_version') : false,
                 'inactiveCardsCount'         => VirtualCard::inactive()->count(),
             ]);
         });

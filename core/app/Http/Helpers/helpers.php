@@ -55,7 +55,7 @@ function getNumber($length = 8) {
 }
 
 function activeTemplate($asset = false) {
-    $template = session('template') ?? gs('active_template');
+    $template = session('template') ?? gs('active_template') ?? 'crystal_sky';
     if ($asset) {
         return 'assets/templates/' . $template . '/';
     }
@@ -64,7 +64,7 @@ function activeTemplate($asset = false) {
 }
 
 function activeTemplateName() {
-    $template = session('template') ?? gs('active_template');
+    $template = session('template') ?? gs('active_template') ?? 'crystal_sky';
     return $template;
 }
 
@@ -416,11 +416,28 @@ function dateSorting($arr) {
 function gs($key = null) {
     $general = Cache::get('GeneralSetting');
     if (!$general) {
-        $general = GeneralSetting::first();
-        Cache::put('GeneralSetting', $general);
+        try {
+            $general = GeneralSetting::first();
+        } catch (\Throwable) {
+            $general = null;
+        }
+        if ($general) {
+            Cache::put('GeneralSetting', $general);
+        }
+    }
+    if (!$general) {
+        $general = new GeneralSetting();
+        $general->forceFill([
+            'site_name'       => config('app.name', 'Talolys'),
+            'cur_text'        => 'USD',
+            'cur_sym'         => '$',
+            'active_template' => 'crystal_sky',
+            'base_color'      => '4634ff',
+            'secondary_color' => '00c2ff',
+        ]);
     }
     if ($key) {
-        return isset($general->$key) ? $general->$key : null;
+        return $general->$key ?? null;
     }
 
     return $general;

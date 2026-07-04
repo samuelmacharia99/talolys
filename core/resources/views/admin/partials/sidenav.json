@@ -1055,9 +1055,6 @@
         "title": "System Info",
         "icon": "la la-server",
         "menu_active": "admin.system*",
-        "counters": [
-            "updateAvailable"
-        ],
         "submenu": [
             {
                 "keyword": [

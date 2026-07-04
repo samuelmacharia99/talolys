@@ -32,8 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         using: function () {
-            Route::middleware(['web', 'central'])
-                ->group(base_path('routes/central/web.php'));
+            foreach (config('tenancy.central_domains', []) as $centralDomain) {
+                Route::domain($centralDomain)
+                    ->middleware(['web', 'central'])
+                    ->group(base_path('routes/central/web.php'));
+            }
 
             Route::namespace('App\Http\Controllers')
                 ->middleware(['tenant', 'tenant.status'])

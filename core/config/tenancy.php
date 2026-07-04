@@ -1,5 +1,15 @@
 <?php
 
+if (!function_exists('talolys_normalize_host')) {
+    function talolys_normalize_host(?string $host): string
+    {
+        $host = strtolower(trim((string) $host));
+        $host = preg_replace('#^https?://#', '', $host);
+
+        return rtrim($host, '/');
+    }
+}
+
 return [
 
   /*
@@ -12,7 +22,10 @@ return [
   |
   */
 
-  'central_domains' => array_filter(array_map('trim', explode(',', env('CENTRAL_DOMAINS', 'localhost,127.0.0.1')))),
+  'central_domains' => array_values(array_filter(array_map(
+      'talolys_normalize_host',
+      explode(',', env('CENTRAL_DOMAINS', 'localhost,127.0.0.1'))
+  ))),
 
   /*
   |--------------------------------------------------------------------------
@@ -20,7 +33,7 @@ return [
   |--------------------------------------------------------------------------
   */
 
-  'tenant_root_domain' => env('TENANT_ROOT_DOMAIN', 'talolys.test'),
+  'tenant_root_domain' => talolys_normalize_host(env('TENANT_ROOT_DOMAIN', 'talolys.test')),
 
   /*
   |--------------------------------------------------------------------------

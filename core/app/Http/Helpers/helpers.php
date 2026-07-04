@@ -56,7 +56,7 @@ function getNumber($length = 8) {
 }
 
 function activeTemplate($asset = false) {
-    $template = session('template') ?? gs('active_template');
+    $template = session('template') ?? gs('active_template') ?? 'crystal_sky';
     if ($asset) {
         return 'assets/templates/' . $template . '/';
     }
@@ -65,7 +65,7 @@ function activeTemplate($asset = false) {
 }
 
 function activeTemplateName() {
-    $template = session('template') ?? gs('active_template');
+    $template = session('template') ?? gs('active_template') ?? 'crystal_sky';
     return $template;
 }
 
@@ -420,13 +420,32 @@ function gs($key = null) {
 
     $general = Cache::get($cacheKey);
     if (!$general) {
-        $general = GeneralSetting::first();
+        try {
+            $general = GeneralSetting::first();
+        } catch (\Throwable) {
+            $general = null;
+        }
         if ($general) {
             Cache::put($cacheKey, $general);
         }
     }
+
+    if (!$general) {
+        $general = new GeneralSetting();
+        $general->forceFill([
+            'site_name' => config('app.name', 'Talolys'),
+            'cur_text' => 'USD',
+            'cur_sym' => '$',
+            'base_color' => '00a6f7',
+            'secondary_color' => '14233c',
+            'active_template' => 'crystal_sky',
+            'paginate_number' => 15,
+            'currency_format' => 3,
+        ]);
+    }
+
     if ($key) {
-        return isset($general->$key) ? $general->$key : null;
+        return $general->$key ?? null;
     }
 
     return $general;

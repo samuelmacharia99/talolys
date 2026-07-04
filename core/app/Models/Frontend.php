@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Frontend extends Model
 {
+    protected $guarded = [];
+
     protected $casts = [
         'data_values' => 'object',
         'seo_content' => 'object'

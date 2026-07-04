@@ -26,9 +26,11 @@
             <div class="row justify-content-center gy-5">
                 <div class="col-xl-3 col-sm-6">
                     <div class="footer-item">
-                        <h5 class="footer-item__title">{{ __(@$footer->data_values->title) }}</h5>
+                        <div class="footer-item__logo mb-3">
+                            <a href="{{ route('home') }}"><img src="{{ siteLogo() }}" alt="@lang('image')"></a>
+                        </div>
                         <p class="footer-item__desc">{{ __(@$footer->data_values->description) }}</p>
-                        <ul class="social-list">
+                        <ul class="social-list mt-3">
                             @foreach ($socialLinks as $social)
                                 <li class="social-list__item">
                                     <a href="{{ $social->data_values->social_link }}" target="_blank" class="social-list__link flex-center">
@@ -39,32 +41,37 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-xl-1 d-xl-block d-none"></div>
                 <div class="col-xl-2 col-sm-6">
                     <div class="footer-item">
-                        <h5 class="footer-item__title">@lang('Pages')</h5>
+                        <h5 class="footer-item__title">@lang('Quick Links')</h5>
                         <ul class="footer-menu">
+                            <li class="footer-menu__item">
+                                <a href="{{ route('home') }}" class="footer-menu__link">@lang('Home')</a>
+                            </li>
                             @auth
                                 <li class="footer-menu__item">
                                     <a href="{{ route('user.home') }}" class="footer-menu__link">@lang('Dashboard')</a>
                                 </li>
                             @else
                                 <li class="footer-menu__item">
-                                    <a href="{{ route('user.register') }}" class="footer-menu__link">@lang('Register')</a>
+                                    <a href="{{ route('user.register') }}" class="footer-menu__link">@lang('Open Account')</a>
+                                </li>
+                                <li class="footer-menu__item">
+                                    <a href="{{ route('user.login') }}" class="footer-menu__link">@lang('Internet Banking')</a>
                                 </li>
                             @endauth
                             <li class="footer-menu__item">
                                 <a href="{{ route('branches') }}" class="footer-menu__link">@lang('Our Branches')</a>
                             </li>
                             <li class="footer-menu__item">
-                                <a href="{{ route('contact') }}" class="footer-menu__link">@lang('Contact')</a>
+                                <a href="{{ route('contact') }}" class="footer-menu__link">@lang('Contact Us')</a>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-xl-2 col-sm-6">
                     <div class="footer-item">
-                        <h5 class="footer-item__title">@lang('Useful Link')</h5>
+                        <h5 class="footer-item__title">@lang('Legal')</h5>
                         <ul class="footer-menu">
                             @foreach ($policyPages as $policy)
                                 <li class="footer-menu__item">
@@ -75,12 +82,32 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-xl-1 d-xl-block d-none"></div>
+                <div class="col-xl-2 col-sm-6">
+                    <div class="footer-item">
+                        <h5 class="footer-item__title">@lang('Products')</h5>
+                        <ul class="footer-menu">
+                            <li class="footer-menu__item">
+                                <a href="javascript:void(0)" class="footer-menu__link">@lang('Savings Account')</a>
+                            </li>
+                            <li class="footer-menu__item">
+                                <a href="javascript:void(0)" class="footer-menu__link">@lang('Fixed Deposit')</a>
+                            </li>
+                            <li class="footer-menu__item">
+                                <a href="javascript:void(0)" class="footer-menu__link">@lang('Personal Loans')</a>
+                            </li>
+                            <li class="footer-menu__item">
+                                <a href="javascript:void(0)" class="footer-menu__link">@lang('Business Loans')</a>
+                            </li>
+                            <li class="footer-menu__item">
+                                <a href="javascript:void(0)" class="footer-menu__link">@lang('Money Transfer')</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="col-xl-3 col-sm-6">
                     <div class="footer-item">
                         <h5 class="footer-item__title">{{ __(@$footer->data_values->contact_title) }}</h5>
                         <ul class="footer-contact-menu">
-
                             <li class="footer-contact-menu__item">
                                 <div class="footer-contact-menu__item-icon">
                                     <i class="fas fa-map-marker-alt"></i>
@@ -118,13 +145,13 @@
         <div class="container">
             <div class="row gy-3 align-items-center">
                 <div class="col-md-6">
-                    <div class="footer-item__logo">
-                        <a href="{{ route('home') }}"> <img src="{{ siteLogo() }}" alt="@lang('image')"></a>
-                    </div>
+                    <p class="bottom-footer-text text-white">
+                        &copy; @php echo date('Y') @endphp {{ __(gs()->site_name) }}. @lang('All Rights Reserved.')
+                    </p>
                 </div>
-                <div class="col-md-6  m-0">
-                    <p class="bottom-footer-text text-white"> &copy; @lang('Copyright') © @php echo date('Y') @endphp {{ __(gs()->site_name) }}
-                        @lang('All Right Reserved').
+                <div class="col-md-6 text-md-end">
+                    <p class="bottom-footer-text text-white" style="font-size: 13px; opacity: 0.8;">
+                        @lang('Regulated by the Central Bank of Kenya')
                     </p>
                 </div>
             </div>

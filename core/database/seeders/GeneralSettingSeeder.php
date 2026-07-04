@@ -4,14 +4,17 @@ namespace Database\Seeders;
 
 use App\Models\GeneralSetting;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class GeneralSettingSeeder extends Seeder
 {
     public function run(): void
     {
+        $tenantData = Schema::hasColumn('general_settings', 'tenant_id') ? ['tenant_id' => 1] : [];
+
         GeneralSetting::updateOrCreate(
             ['id' => 1],
-            [
+            array_merge($tenantData, [
                 'site_name'        => 'Talolys',
                 'cur_text'         => 'KES',
                 'cur_sym'          => 'KSh',
@@ -50,7 +53,7 @@ class GeneralSettingSeeder extends Seeder
                     'virtual_card'       => 0,
                     'airtime'            => 0,
                 ]),
-            ]
+            ])
         );
 
         $this->command->info('General settings seeded for Talolys.');

@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class UserSeeder extends Seeder
 {
@@ -14,6 +15,7 @@ class UserSeeder extends Seeder
     {
         $branch = Branch::first();
         $branchId = $branch?->id ?? 0;
+        $tenantData = Schema::hasColumn('users', 'tenant_id') ? ['tenant_id' => 1] : [];
 
         $users = [
             [
@@ -61,7 +63,7 @@ class UserSeeder extends Seeder
         foreach ($users as $userData) {
             User::updateOrCreate(
                 ['username' => $userData['username']],
-                array_merge($userData, [
+                array_merge($userData, $tenantData, [
                     'password'         => Hash::make('password123'),
                     'branch_id'        => $branchId,
                     'country_code'     => 'KE',

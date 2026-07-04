@@ -19,9 +19,9 @@ class GeneralSetting extends Model {
 
     protected $hidden = ['email_template', 'mail_config', 'sms_config', 'system_info'];
 
-    public function scopeSiteName($query, $pageTitle) {
+    public function siteName($pageTitle = '') {
         $pageTitle = empty($pageTitle) ? '' : ' - ' . $pageTitle;
-        return $this->site_name . $pageTitle;
+        return ($this->site_name ?? config('app.name', 'Talolys')) . $pageTitle;
     }
 
     // Accessor
@@ -46,7 +46,10 @@ class GeneralSetting extends Model {
     protected static function boot() {
         parent::boot();
         static::saved(function () {
-            \Cache::forget('GeneralSetting');
+            try {
+                \Cache::forget('GeneralSetting');
+            } catch (\Throwable) {
+            }
         });
     }
 }

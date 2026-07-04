@@ -1,6 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Facade;
-require_once('timezone.php');
+
 return [
 
     /*
@@ -66,7 +66,16 @@ return [
     |
     */
 
-    'timezone' => $timezone,
+    'timezone' => (function () {
+        $file = __DIR__ . '/timezone.php';
+        if (file_exists($file)) {
+            include $file;
+            if (isset($timezone) && $timezone) {
+                return $timezone;
+            }
+        }
+        return env('APP_TIMEZONE', 'UTC');
+    })(),
 
     /*
     |--------------------------------------------------------------------------

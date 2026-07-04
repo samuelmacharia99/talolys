@@ -21,9 +21,13 @@ class ActiveTemplateMiddleware
     public function handle(Request $request, Closure $next)
     {
         view()->composer(['Template::partials.header', 'Template::partials.footer'], function ($view) {
-            $view->with([
-                'pages' => Page::where('is_default', Status::NO)->where('tempname', activeTemplate())->orderBy('id', 'DESC')->get()
-            ]);
+            try {
+                $view->with([
+                    'pages' => Page::where('is_default', Status::NO)->where('tempname', activeTemplate())->orderBy('id', 'DESC')->get()
+                ]);
+            } catch (\Throwable) {
+                $view->with(['pages' => collect()]);
+            }
         });
 
         View::addNamespace('Template', resource_path('views/templates/' . activeTemplateName()));

@@ -1,18 +1,23 @@
 @php
-    $requiredConfig = new \App\Lib\RequiredConfig();
-    $configs = $requiredConfig->getConfig();
-    $progressPercentage = $requiredConfig->completedConfigPercent();
-    $completedConfig = $requiredConfig->completedConfig();
-    uksort($configs, function ($a, $b) use ($completedConfig) {
-        $aIndex = array_search($a, $completedConfig);
-        $bIndex = array_search($b, $completedConfig);
-        $aIndex = $aIndex === false ? -1 : $aIndex + 100;
-        $bIndex = $bIndex === false ? -1 : $bIndex + 100;
+    try {
+        $requiredConfig = new \App\Lib\RequiredConfig();
+        $configs = $requiredConfig->getConfig();
+        $progressPercentage = $requiredConfig->completedConfigPercent();
+        $completedConfig = $requiredConfig->completedConfig();
+        uksort($configs, function ($a, $b) use ($completedConfig) {
+            $aIndex = array_search($a, $completedConfig);
+            $bIndex = array_search($b, $completedConfig);
+            $aIndex = $aIndex === false ? -1 : $aIndex + 100;
+            $bIndex = $bIndex === false ? -1 : $bIndex + 100;
 
-        return $aIndex <=> $bIndex;
-    });
+            return $aIndex <=> $bIndex;
+        });
+        $showConfigProcess = $requiredConfig->completedConfigCount() < $requiredConfig->totalConfigs();
+    } catch (\Throwable $e) {
+        $showConfigProcess = false;
+    }
 @endphp
-@if ($requiredConfig->completedConfigCount() < $requiredConfig->totalConfigs())
+@if ($showConfigProcess)
 
     <div class="configure-card-wrapper">
         <div class="configure-card">

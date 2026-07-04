@@ -43,37 +43,67 @@ class AppServiceProvider extends ServiceProvider
         view()->share($viewShare);
 
         view()->composer('admin.partials.sidenav', function ($view) {
-            $view->with([
-                'bannedUsersCount'           => User::banned()->count(),
-                'emailUnverifiedUsersCount'  => User::emailUnverified()->count(),
-                'mobileUnverifiedUsersCount' => User::mobileUnverified()->count(),
-                'kycUnverifiedUsersCount'    => User::kycUnverified()->count(),
-                'kycPendingUsersCount'       => User::kycPending()->count(),
+            try {
+                $view->with([
+                    'bannedUsersCount'           => User::banned()->count(),
+                    'emailUnverifiedUsersCount'  => User::emailUnverified()->count(),
+                    'mobileUnverifiedUsersCount' => User::mobileUnverified()->count(),
+                    'kycUnverifiedUsersCount'    => User::kycUnverified()->count(),
+                    'kycPendingUsersCount'       => User::kycPending()->count(),
 
-                'pendingTicketCount'         => SupportTicket::whereIN('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count(),
-                'pendingDepositsCount'       => Deposit::pending()->count(),
-                'pendingWithdrawCount'       => Withdrawal::pending()->count(),
-                'dueFdrCount'                => Fdr::due()->count(),
-                'lateInstallmentDpsCount'    => Dps::due()->count(),
-                'lateInstallmentLoanCount'   => Loan::due()->count(),
-                'pendingLoanCount'           => Loan::pending()->count(),
-                'pendingTransferCount'       => BalanceTransfer::pending()->count(),
-                'inactiveCardsCount'         => VirtualCard::inactive()->count(),
-            ]);
+                    'pendingTicketCount'         => SupportTicket::whereIN('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count(),
+                    'pendingDepositsCount'       => Deposit::pending()->count(),
+                    'pendingWithdrawCount'       => Withdrawal::pending()->count(),
+                    'dueFdrCount'                => Fdr::due()->count(),
+                    'lateInstallmentDpsCount'    => Dps::due()->count(),
+                    'lateInstallmentLoanCount'   => Loan::due()->count(),
+                    'pendingLoanCount'           => Loan::pending()->count(),
+                    'pendingTransferCount'       => BalanceTransfer::pending()->count(),
+                    'inactiveCardsCount'         => VirtualCard::inactive()->count(),
+                ]);
+            } catch (\Throwable) {
+                $view->with([
+                    'bannedUsersCount'           => 0,
+                    'emailUnverifiedUsersCount'  => 0,
+                    'mobileUnverifiedUsersCount' => 0,
+                    'kycUnverifiedUsersCount'    => 0,
+                    'kycPendingUsersCount'       => 0,
+                    'pendingTicketCount'         => 0,
+                    'pendingDepositsCount'       => 0,
+                    'pendingWithdrawCount'       => 0,
+                    'dueFdrCount'                => 0,
+                    'lateInstallmentDpsCount'    => 0,
+                    'lateInstallmentLoanCount'   => 0,
+                    'pendingLoanCount'           => 0,
+                    'pendingTransferCount'       => 0,
+                    'inactiveCardsCount'         => 0,
+                ]);
+            }
         });
 
         view()->composer('admin.partials.topnav', function ($view) {
-            $view->with([
-                'adminNotifications' => AdminNotification::where('is_read', Status::NO)->with('user')->orderBy('id', 'desc')->take(10)->get(),
-                'adminNotificationCount' => AdminNotification::where('is_read', Status::NO)->count(),
-            ]);
+            try {
+                $view->with([
+                    'adminNotifications' => AdminNotification::where('is_read', Status::NO)->with('user')->orderBy('id', 'desc')->take(10)->get(),
+                    'adminNotificationCount' => AdminNotification::where('is_read', Status::NO)->count(),
+                ]);
+            } catch (\Throwable) {
+                $view->with([
+                    'adminNotifications' => collect(),
+                    'adminNotificationCount' => 0,
+                ]);
+            }
         });
 
         view()->composer('partials.seo', function ($view) {
-            $seo = Frontend::where('data_keys', 'seo.data')->first();
-            $view->with([
-                'seo' => $seo ? $seo->data_values : $seo,
-            ]);
+            try {
+                $seo = Frontend::where('data_keys', 'seo.data')->first();
+                $view->with([
+                    'seo' => $seo ? $seo->data_values : $seo,
+                ]);
+            } catch (\Throwable) {
+                $view->with(['seo' => null]);
+            }
         });
 
         if (str_starts_with(config('app.url'), 'https')) {

@@ -29,10 +29,12 @@ class BranchSeeder extends Seeder
         $staff = BranchStaff::updateOrCreate(
             ['email' => 'manager@talolys.com'],
             array_merge([
-                'name'     => 'Branch Manager',
-                'mobile'   => '254700000001',
-                'password' => Hash::make('password123'),
-                'status'   => 1,
+                'name'        => 'Branch Manager',
+                'mobile'      => '254700000001',
+                'designation' => 1,
+                'address'     => '123 Finance Street, Nairobi',
+                'password'    => Hash::make('password123'),
+                'status'      => 1,
             ], $staffTenantData)
         );
 

@@ -90,8 +90,12 @@ function verifyCaptcha() {
 }
 
 function loadExtension($key) {
-    $extension = Extension::where('act', $key)->where('status', Status::ENABLE)->first();
-    return $extension ? $extension->generateScript() : '';
+    try {
+        $extension = Extension::where('act', $key)->where('status', Status::ENABLE)->first();
+        return $extension ? $extension->generateScript() : '';
+    } catch (\Throwable) {
+        return '';
+    }
 }
 
 function getTrx($length = 12) {
@@ -183,13 +187,20 @@ function getTemplates() {
 }
 
 function getPageSections($arr = false) {
-    $jsonUrl  = resource_path('views/') . str_replace('.', '/', activeTemplate()) . 'sections.json';
-    $sections = json_decode(file_get_contents($jsonUrl));
-    if ($arr) {
-        $sections = json_decode(file_get_contents($jsonUrl), true);
-        ksort($sections);
+    try {
+        $jsonUrl  = resource_path('views/') . str_replace('.', '/', activeTemplate()) . 'sections.json';
+        if (!file_exists($jsonUrl)) {
+            return $arr ? [] : null;
+        }
+        $sections = json_decode(file_get_contents($jsonUrl));
+        if ($arr) {
+            $sections = json_decode(file_get_contents($jsonUrl), true);
+            ksort($sections);
+        }
+        return $sections;
+    } catch (\Throwable) {
+        return $arr ? [] : null;
     }
-    return $sections;
 }
 
 function getImage($image, $size = null, $avatar = false) {
@@ -414,28 +425,42 @@ function dateSorting($arr) {
 }
 
 function gs($key = null) {
-    $general = Cache::get('GeneralSetting');
+    $general = null;
+
+    try {
+        $general = Cache::get('GeneralSetting');
+    } catch (\Throwable) {
+        $general = null;
+    }
+
     if (!$general) {
         try {
             $general = GeneralSetting::first();
+            if ($general) {
+                try {
+                    Cache::put('GeneralSetting', $general);
+                } catch (\Throwable) {
+                }
+            }
         } catch (\Throwable) {
             $general = null;
         }
-        if ($general) {
-            Cache::put('GeneralSetting', $general);
-        }
     }
+
     if (!$general) {
         $general = new GeneralSetting();
         $general->forceFill([
-            'site_name'       => config('app.name', 'Talolys'),
-            'cur_text'        => 'USD',
-            'cur_sym'         => '$',
-            'active_template' => 'crystal_sky',
-            'base_color'      => '4634ff',
-            'secondary_color' => '00c2ff',
+            'site_name'        => config('app.name', 'Talolys'),
+            'cur_text'         => 'USD',
+            'cur_sym'          => '$',
+            'active_template'  => 'crystal_sky',
+            'base_color'       => '4634ff',
+            'secondary_color'  => '00c2ff',
+            'account_no_prefix'=> 'TLY',
+            'account_no_length'=> 16,
         ]);
     }
+
     if ($key) {
         return $general->$key ?? null;
     }
@@ -731,7 +756,11 @@ function getReferees($user, $maxLevel, $data = [], $depth = 1, $layer = 0) {
 }
 
 function getDefaultLang() {
-    return Language::where('is_default', Status::YES)->first()->code ?? 'en';
+    try {
+        return Language::where('is_default', Status::YES)->first()->code ?? 'en';
+    } catch (\Throwable) {
+        return 'en';
+    }
 }
 
 function stripeSecretKey() {

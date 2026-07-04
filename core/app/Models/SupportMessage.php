@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use Illuminate\Database\Eloquent\Model;
 
 class SupportMessage extends Model {
-    use BelongsToTenant;
 
     public function ticket() {
         return $this->belongsTo(SupportTicket::class, 'support_ticket_id', 'id');

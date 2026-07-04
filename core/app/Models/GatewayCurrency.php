@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Constants\Status;
 use Illuminate\Database\Eloquent\Model;
 
 class GatewayCurrency extends Model {
-    use BelongsToTenant;
 
     protected $hidden = [
         'gateway_parameter'

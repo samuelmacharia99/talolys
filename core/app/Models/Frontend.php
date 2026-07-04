@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use Illuminate\Database\Eloquent\Model;
 
 class Frontend extends Model
 {
-    use BelongsToTenant;
     protected $casts = [
         'data_values' => 'object',
         'seo_content' => 'object'

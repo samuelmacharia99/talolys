@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Form extends Model {
-    use BelongsToTenant;
     public $casts = [
         'form_data' => 'object'
     ];

@@ -54,10 +54,6 @@ return [
             'driver'   => 'session',
             'provider' => 'branch_staff',
         ],
-        'platform' => [
-            'driver'   => 'session',
-            'provider' => 'platform_admins',
-        ],
     ],
 
     /*
@@ -89,10 +85,6 @@ return [
         'branch_staff' => [
             'driver' => 'eloquent',
             'model' => App\Models\BranchStaff::class,
-        ],
-        'platform_admins' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\PlatformAdmin::class,
         ],
 
         // 'users' => [

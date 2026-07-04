@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Traits\GlobalStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class CronJob extends Model
 {
-    use BelongsToTenant;
     use GlobalStatus;
 
     protected $casts = ['action'=>'array'];

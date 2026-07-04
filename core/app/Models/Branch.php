@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Constants\Status;
 use App\Traits\GlobalStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Branch extends Model
 {
-    use BelongsToTenant;
     use GlobalStatus;
 
     public function assignStaff()

@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Traits\ApiQuery;
 use Illuminate\Database\Eloquent\Model;
 
 class Beneficiary extends Model
 {
-    use BelongsToTenant;
     use ApiQuery;
     
     protected $casts = [

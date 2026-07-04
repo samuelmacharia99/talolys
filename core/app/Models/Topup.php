@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use Illuminate\Database\Eloquent\Model;
 
 class Topup extends Model {
-    use BelongsToTenant;
     public function card() {
         return $this->belongsTo(VirtualCard::class, 'virtual_card_id');
     }

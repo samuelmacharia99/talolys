@@ -2,15 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use Illuminate\Database\Eloquent\Model;
 
 class GeneralSetting extends Model {
-    use BelongsToTenant;
-
-    protected $guarded = [];
-
     protected $casts = [
         'mail_config'           => 'object',
         'sms_config'            => 'object',
@@ -52,12 +46,7 @@ class GeneralSetting extends Model {
     protected static function boot() {
         parent::boot();
         static::saved(function () {
-            $context = app(\App\Support\Tenancy\TenantContext::class);
-            if ($context->has()) {
-                \Cache::forget($context->cacheKey('GeneralSetting'));
-            } else {
-                \Cache::forget('GeneralSetting');
-            }
+            \Cache::forget('GeneralSetting');
         });
     }
 }

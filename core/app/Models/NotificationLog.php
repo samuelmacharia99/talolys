@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Traits\ApiQuery;
 use Illuminate\Database\Eloquent\Model;
 
 class NotificationLog extends Model {
-    use BelongsToTenant;
     use ApiQuery;
 
     public function user() {

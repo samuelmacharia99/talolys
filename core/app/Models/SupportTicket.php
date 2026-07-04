@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Constants\Status;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class SupportTicket extends Model {
-    use BelongsToTenant;
     public function fullname(): Attribute {
         return new Attribute(
              get:fn () => $this->user ? $this->user->fullname : $this->name,

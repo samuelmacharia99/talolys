@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Constants\Status;
 use App\Traits\GlobalStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -11,7 +9,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class BranchStaff extends Authenticatable
 {
-    use BelongsToTenant;
     use GlobalStatus;
 
     protected $hidden = [

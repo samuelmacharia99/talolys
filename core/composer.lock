@@ -1778,6 +1778,49 @@
             "time": "2025-10-12T15:31:36+00:00"
         },
         {
+            "name": "laramin/utility",
+            "version": "v1.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kbzaman76/utility.git",
+                "reference": "7010eef6e72982b6eedf9856cea7d03a3d064c75"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kbzaman76/utility/zipball/7010eef6e72982b6eedf9856cea7d03a3d064c75",
+                "reference": "7010eef6e72982b6eedf9856cea7d03a3d064c75",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laramin\\Utility\\UtilityServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laramin\\Utility\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "laramin"
+                }
+            ],
+            "description": "Utility services for application.",
+            "support": {
+                "issues": "https://github.com/kbzaman76/utility/issues",
+                "source": "https://github.com/kbzaman76/utility/tree/v1.0.7"
+            },
+            "time": "2024-05-12T07:08:27+00:00"
+        },
+        {
             "name": "laravel/framework",
             "version": "v11.48.0",
             "source": {

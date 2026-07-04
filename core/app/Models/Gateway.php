@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Constants\Status;
 use App\Traits\GlobalStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Gateway extends Model {
-    use BelongsToTenant;
     use GlobalStatus;
 
     protected $hidden = [

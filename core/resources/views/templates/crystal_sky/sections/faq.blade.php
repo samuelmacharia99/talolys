@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="col-lg-8 col-md-12 right-section">
-                    <div class="accordion accordion-flush custom--accordion" id="talolys-faq">
+                    <div class="accordion accordion-flush custom--accordion" id="viserBank-faq">
                         @foreach ($faqs as $faq)
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
@@ -32,7 +32,7 @@
                                     </button>
                                 </h2>
                                 <div id="id-{{ $loop->iteration }}-faq"
-                                    class="accordion-collapse collapse @if ($loop->first) show @endif" data-bs-parent="#talolys-faq">
+                                    class="accordion-collapse collapse @if ($loop->first) show @endif" data-bs-parent="#viserBank-faq">
                                     <p class="accordion-body">
                                         {{ __(@$faq->data_values->answer) }}
                                     </p>

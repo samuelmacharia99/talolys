@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Constants\Status;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +9,6 @@ use Stripe\Issuing\Card;
 use Stripe\Stripe;
 
 class VirtualCard extends Model {
-    use BelongsToTenant;
     protected $casts = [
         'address' => 'object',
     ];

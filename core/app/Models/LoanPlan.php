@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Traits\ApiQuery;
 use App\Traits\GlobalStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class LoanPlan extends Model {
-    use BelongsToTenant;
     use GlobalStatus, ApiQuery;
 
     protected $guarded = ['id'];

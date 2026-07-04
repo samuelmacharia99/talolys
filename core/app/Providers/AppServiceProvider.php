@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use App\Traits\ApiQuery;
-use App\Support\Tenancy\TenantContext;
-use Illuminate\Support\Facades\Redirect;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -30,8 +28,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(\App\Support\Tenancy\TenantContext::class);
-
         Builder::mixin(new Searchable);
         Builder::macro('apiQuery', function () {
             return ApiQuery::scopeApiQuery($this);
@@ -45,24 +41,18 @@ class AppServiceProvider extends ServiceProvider
     {
 
 
-        if (!app()->runningInConsole()) {
-            try {
-                if (!cache()->get('SystemInstalled')) {
-                    $envFilePath = base_path('.env');
-                    if (!file_exists($envFilePath)) {
-                        header('Location: install');
-                        exit;
-                    }
-                    $envContents = file_get_contents($envFilePath);
-                    if (empty($envContents)) {
-                        header('Location: install');
-                        exit;
-                    }
-
-                    cache()->put('SystemInstalled', true);
-                }
-            } catch (\Throwable) {
-                // Database or cache table not ready yet (e.g. before migrations).
+        if (!cache()->get('SystemInstalled')) {
+            $envFilePath = base_path('.env');
+            if (!file_exists($envFilePath)) {
+                header('Location: install');
+                exit;
+            }
+            $envContents = file_get_contents($envFilePath);
+            if (empty($envContents)) {
+                header('Location: install');
+                exit;
+            } else {
+                cache()->put('SystemInstalled', true);
             }
         }
 
@@ -70,9 +60,6 @@ class AppServiceProvider extends ServiceProvider
         view()->share($viewShare);
 
         view()->composer('admin.partials.sidenav', function ($view) {
-            if (!app(TenantContext::class)->has()) {
-                return;
-            }
             $view->with([
                 'bannedUsersCount'           => User::banned()->count(),
                 'emailUnverifiedUsersCount'  => User::emailUnverified()->count(),
@@ -88,14 +75,12 @@ class AppServiceProvider extends ServiceProvider
                 'lateInstallmentLoanCount'   => Loan::due()->count(),
                 'pendingLoanCount'           => Loan::pending()->count(),
                 'pendingTransferCount'       => BalanceTransfer::pending()->count(),
+                'updateAvailable'            => version_compare(gs('available_version'), systemDetails()['version'], '>') ? 'v' . gs('available_version') : false,
                 'inactiveCardsCount'         => VirtualCard::inactive()->count(),
             ]);
         });
 
         view()->composer('admin.partials.topnav', function ($view) {
-            if (!app(TenantContext::class)->has()) {
-                return;
-            }
             $view->with([
                 'adminNotifications' => AdminNotification::where('is_read', Status::NO)->with('user')->orderBy('id', 'desc')->take(10)->get(),
                 'adminNotificationCount' => AdminNotification::where('is_read', Status::NO)->count(),
@@ -103,9 +88,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         view()->composer('partials.seo', function ($view) {
-            if (!app(TenantContext::class)->has()) {
-                return;
-            }
             $seo = Frontend::where('data_keys', 'seo.data')->first();
             $view->with([
                 'seo' => $seo ? $seo->data_values : $seo,
@@ -118,9 +100,5 @@ class AppServiceProvider extends ServiceProvider
 
 
         Paginator::useBootstrapFive();
-
-        Redirect::macro('withNotify', function (array $notify) {
-            return $this->with('notify', $notify);
-        });
     }
 }

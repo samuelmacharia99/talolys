@@ -8,7 +8,7 @@ Route::get('/clear', function () {
 
 
 Route::post('webhook', 'WebhookController@stripeWebhook')->name('stripe.webhook');
-Route::get('cron', 'CronController@cron')->middleware('cron.secret')->name('cron');
+Route::get('cron', 'CronController@cron')->name('cron');
 
 // User Support Ticket
 Route::controller('TicketController')->prefix('ticket')->name('ticket.')->group(function () {

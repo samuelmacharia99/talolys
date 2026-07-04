@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-
 use App\Constants\Status;
 use App\Traits\ApiQuery;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -11,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Dps extends Model
 {
-    use BelongsToTenant;
     use ApiQuery;
 
     protected $guarded = ['id'];

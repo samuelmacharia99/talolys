@@ -45,6 +45,10 @@ Route::middleware('admin', 'adminPermission')->group(function () {
         Route::post('notifications/delete-all', 'deleteAllNotification')->name('notifications.delete.all');
         Route::post('notifications/delete-single/{id}', 'deleteSingleNotification')->name('notifications.delete.single');
 
+        //Report Bugs
+        Route::get('request-report', 'requestReport')->name('request.report')->middleware('superAdminPermission');
+        Route::post('request-report', 'reportSubmit')->name('request.report.submit')->middleware('superAdminPermission');
+
         Route::get('download-attachments/{file_hash}', 'downloadAttachment')->name('download.attachment');
     });
 
@@ -486,6 +490,9 @@ Route::middleware('admin', 'adminPermission')->group(function () {
         Route::get('server-info', 'systemServerInfo')->name('server.info');
         Route::get('optimize', 'optimize')->name('optimize');
         Route::get('optimize-clear', 'optimizeClear')->name('optimize.clear');
+        Route::get('system-update', 'systemUpdate')->name('update');
+        Route::post('system-update', 'systemUpdateProcess')->name('update.process');
+        Route::get('system-update/log', 'systemUpdateLog')->name('update.log');
     });
 
 

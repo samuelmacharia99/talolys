@@ -23,9 +23,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laramin\Utility\VugiChugi;
 
 function systemDetails() {
-    $system['name']          = 'Talolys';
+    $system['name']          = 'viserbank';
     $system['version']       = '3.3';
     $system['build_version'] = '5.1.19';
     return $system;
@@ -56,7 +57,7 @@ function getNumber($length = 8) {
 }
 
 function activeTemplate($asset = false) {
-    $template = session('template') ?? gs('active_template') ?? 'crystal_sky';
+    $template = session('template') ?? gs('active_template');
     if ($asset) {
         return 'assets/templates/' . $template . '/';
     }
@@ -65,7 +66,7 @@ function activeTemplate($asset = false) {
 }
 
 function activeTemplateName() {
-    $template = session('template') ?? gs('active_template') ?? 'crystal_sky';
+    $template = session('template') ?? gs('active_template');
     return $template;
 }
 
@@ -180,7 +181,16 @@ function osBrowser() {
 }
 
 function getTemplates() {
-    return json_encode([]);
+    $param['purchasecode'] = env("PURCHASECODE");
+    $requestUri            = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    $param['website']      = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '' . $requestUri . ' - ' . env("APP_URL");
+    $url                   = VugiChugi::gttmp() . systemDetails()['name'];
+    $response              = CurlRequest::curlPostContent($url, $param);
+    if ($response) {
+        return $response;
+    } else {
+        return null;
+    }
 }
 
 function getPageSections($arr = false) {
@@ -415,37 +425,13 @@ function dateSorting($arr) {
 }
 
 function gs($key = null) {
-    $context = app(\App\Support\Tenancy\TenantContext::class);
-    $cacheKey = $context->has() ? $context->cacheKey('GeneralSetting') : 'GeneralSetting';
-
-    $general = Cache::get($cacheKey);
+    $general = Cache::get('GeneralSetting');
     if (!$general) {
-        try {
-            $general = GeneralSetting::first();
-        } catch (\Throwable) {
-            $general = null;
-        }
-        if ($general) {
-            Cache::put($cacheKey, $general);
-        }
+        $general = GeneralSetting::first();
+        Cache::put('GeneralSetting', $general);
     }
-
-    if (!$general) {
-        $general = new GeneralSetting();
-        $general->forceFill([
-            'site_name' => config('app.name', 'Talolys'),
-            'cur_text' => 'USD',
-            'cur_sym' => '$',
-            'base_color' => '00a6f7',
-            'secondary_color' => '14233c',
-            'active_template' => 'crystal_sky',
-            'paginate_number' => 15,
-            'currency_format' => 3,
-        ]);
-    }
-
     if ($key) {
-        return $general->$key ?? null;
+        return isset($general->$key) ? $general->$key : null;
     }
 
     return $general;

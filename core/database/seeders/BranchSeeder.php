@@ -36,9 +36,11 @@ class BranchSeeder extends Seeder
             ], $staffTenantData)
         );
 
+        $pivotTenantData = Schema::hasColumn('assign_branch_staff', 'tenant_id') ? ['tenant_id' => 1] : [];
+
         DB::table('assign_branch_staff')->updateOrInsert(
             ['staff_id' => $staff->id, 'branch_id' => $branch->id],
-            ['staff_id' => $staff->id, 'branch_id' => $branch->id]
+            array_merge(['staff_id' => $staff->id, 'branch_id' => $branch->id], $pivotTenantData)
         );
 
         $this->command->info("Branch staff created: email=manager@talolys.com, password=password123");

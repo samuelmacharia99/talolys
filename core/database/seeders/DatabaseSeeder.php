@@ -13,10 +13,10 @@ class DatabaseSeeder extends Seeder
         $this->ensureTenantExists();
 
         $this->call([
+            GeneralSettingSeeder::class,
             AdminSeeder::class,
             BranchSeeder::class,
             UserSeeder::class,
-            GeneralSettingSeeder::class,
         ]);
     }
 

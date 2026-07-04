@@ -64,6 +64,7 @@ class UserSeeder extends Seeder
             User::updateOrCreate(
                 ['username' => $userData['username']],
                 array_merge($userData, $tenantData, [
+                    'account_number'   => generateAccountNumber(),
                     'password'         => Hash::make('password123'),
                     'branch_id'        => $branchId,
                     'country_code'     => 'KE',

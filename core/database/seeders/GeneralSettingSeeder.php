@@ -21,6 +21,8 @@ class GeneralSettingSeeder extends Seeder
                 'base_color'       => '4634ff',
                 'secondary_color'  => '00c2ff',
                 'active_template'  => 'crystal_sky',
+                'account_no_prefix'=> 'TLY',
+                'account_no_length'=> 16,
                 'mail_config'      => json_encode([
                     'name'     => 'php',
                     'host'     => '',

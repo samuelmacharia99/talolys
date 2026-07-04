@@ -7,7 +7,7 @@
 @section('panel')
     <div class="row">
         <div class="col-lg-12">
-            <div class="card viser--table b-radius--10">
+            <div class="card data--table b-radius--10">
                 <div class="card-body p-0">
                     <div class="table-responsive--lg table-responsive">
                         <table class="table--light style--two table">

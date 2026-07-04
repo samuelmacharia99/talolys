@@ -6,7 +6,7 @@
 @section('panel')
     <div class="row">
         <div class="col-lg-12">
-            <div class="card viser--table overflow-hidden">
+            <div class="card data--table overflow-hidden">
                 <div class="card-header d-flex justify-content-end table-options">
                     <x-search-form btn="btn--light border h-auto"/>
                 </div>

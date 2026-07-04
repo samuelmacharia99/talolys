@@ -39,6 +39,6 @@
         $action = ['show' => false];
     @endphp
 
-    <x-viser_table.table :action="$action" :data="$transactions" :columns="$columns" :columnConfig="true" :tableName="$tableName"
+    <x-data_table.table :action="$action" :data="$transactions" :columns="$columns" :columnConfig="true" :tableName="$tableName"
         :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
 @endsection

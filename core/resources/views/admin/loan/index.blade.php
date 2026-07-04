@@ -51,5 +51,5 @@
         }
     @endphp
 
-    <x-viser_table.table :data="$loans" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" searchPlaceholder="Loan No. / Account No. / Plan" />
+    <x-data_table.table :data="$loans" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" searchPlaceholder="Loan No. / Account No. / Plan" />
 @endsection

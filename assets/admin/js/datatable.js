@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const table = $('#viserTable');
+    const table = $('#dataTable');
     const modal = $('#exportModal');
 
     const tableColumns = table.find('thead th[data-key]').map((index, th) => ({

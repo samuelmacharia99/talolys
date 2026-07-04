@@ -4,7 +4,7 @@
         <div class="row">
 
             <div class="col-lg-12">
-                <div class="card viser--table">
+                <div class="card data--table">
 
                     <div class="card-header d-flex justify-content-between gap-2 py-3">
                         <h5>@lang('Language Keywords of') {{ __($lang->name) }}</h5>

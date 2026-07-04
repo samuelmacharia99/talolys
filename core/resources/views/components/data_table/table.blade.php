@@ -16,7 +16,7 @@
     'visibleColumns' => [],
 ])
 
-<div class="card viser--table">
+<div class="card data--table">
     @php
         $filterable = collect($columns)->whereNotNull('filter')->count() > 0;
         $renderColumns = $columns->whereIn('id', $visibleColumns);
@@ -24,14 +24,14 @@
 
     @if ($rows || $sortable || $exportable || $searchable || $filterable)
         <div class="card-header py-3">
-            <x-viser_table.table-options :filterable="$filterable" :rows="$rows" :sortable="$sortable" :exportable="$exportable" :searchable="$searchable" />
+            <x-data_table.table-options :filterable="$filterable" :rows="$rows" :sortable="$sortable" :exportable="$exportable" :searchable="$searchable" />
         </div>
     @endif
 
     <div class="card-body p-0 ">
         <div {{ $attributes }}>
-            <table class="table--light style--two table" id="viserTable">
-                <x-viser_table.table-header :renderColumns="$renderColumns" :action="$action" />
+            <table class="table--light style--two table" id="dataTable">
+                <x-data_table.table-header :renderColumns="$renderColumns" :action="$action" />
 
                 @if (@$tbody)
                     {{ $tbody }}
@@ -39,11 +39,11 @@
                     <tbody>
                         @forelse ($data as $item)
                             <tr>
-                                <x-viser_table.table-data-columns :renderColumns="$renderColumns" :item="$item" />
+                                <x-data_table.table-data-columns :renderColumns="$renderColumns" :item="$item" />
 
                                 @if ($action['show'])
                                     <td>
-                                        <x-viser_table.table-actions :action="$action" :item="$item" />
+                                        <x-data_table.table-actions :action="$action" :item="$item" />
                                     </td>
                                 @endif
                             </tr>

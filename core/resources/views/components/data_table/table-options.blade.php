@@ -98,7 +98,7 @@
 </div>
 
 @if ($filterable)
-    <x-viser_table.table-filter />
+    <x-data_table.table-filter />
 @endif
 
 @if ($exportable)
@@ -197,7 +197,7 @@
     <script src="{{ asset('assets/admin/js/vendor/xlsx.full.min.js') }} "></script>
     <script src="{{ asset('assets/admin/js/vendor/jspdf.umd.min.js') }} "></script>
     <script src="{{ asset('assets/admin/js/vendor/jspdf.plugin.autotable.min.js') }} "></script>
-    <script src="{{ asset('assets/admin/js/visertable.js') }}" type="module"></script>
+    <script src="{{ asset('assets/admin/js/datatable.js') }}" type="module"></script>
 @endpush
 
 @push('script')

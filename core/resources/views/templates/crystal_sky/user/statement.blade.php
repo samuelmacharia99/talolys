@@ -53,7 +53,7 @@
                             <button class="btn btn--base btn--sm" id="exportButton" type="button"><i class="las la-cloud-download-alt"></i> @lang('Download Statement')</button>
                         </div>
                         <div class="table-responsive">
-                            <table class="table table--responsive--md has-search-form" id="viserTable">
+                            <table class="table table--responsive--md has-search-form" id="dataTable">
                                 <thead>
                                     <tr>
                                         <th>@lang('TRX No.')</th>
@@ -105,7 +105,7 @@
 @push('script-lib')
     <script src="{{ asset('assets/admin/js/vendor/jspdf.umd.min.js') }} "></script>
     <script src="{{ asset('assets/admin/js/vendor/jspdf.plugin.autotable.min.js') }} "></script>
-    <script src="{{ asset('assets/admin/js/visertable.js') }}" type="module"></script>
+    <script src="{{ asset('assets/admin/js/datatable.js') }}" type="module"></script>
 @endpush
 
 @push('script')

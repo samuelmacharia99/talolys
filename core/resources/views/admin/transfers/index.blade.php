@@ -50,5 +50,5 @@
         }
     @endphp
 
-    <x-viser_table.table :data="$transfers" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" searchPlaceholder="Trx / Sender / Receiver" />
+    <x-data_table.table :data="$transfers" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" searchPlaceholder="Trx / Sender / Receiver" />
 @endsection

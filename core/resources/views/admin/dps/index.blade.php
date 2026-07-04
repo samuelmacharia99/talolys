@@ -47,5 +47,5 @@
         }
     @endphp
 
-    <x-viser_table.table :data="$data" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" searchPlaceholder="DPS No. / Account No." />
+    <x-data_table.table :data="$data" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" searchPlaceholder="DPS No. / Account No." />
 @endsection

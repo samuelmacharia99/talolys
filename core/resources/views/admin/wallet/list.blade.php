@@ -37,7 +37,7 @@
 
 
 
-    <x-viser_table.table :data="$wallets" :columns="$columns" :action="$action" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
+    <x-data_table.table :data="$wallets" :columns="$columns" :action="$action" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
 
 @endsection
 

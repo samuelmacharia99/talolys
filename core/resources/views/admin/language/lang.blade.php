@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="col-lg-12">
-            <div class="card viser--table">
+            <div class="card data--table">
                 <div class="card-body p-0">
                     <div class="table-responsive--sm table-responsive">
                         <table class="table table--light style--two custom-data-table">

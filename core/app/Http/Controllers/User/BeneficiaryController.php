@@ -165,7 +165,7 @@ class BeneficiaryController extends Controller
 
 
         $formData = $bank->form->form_data;
-        $html = view('components.viser-form', compact('formData'))->render();
+        $html = view('components.app-form', compact('formData'))->render();
 
         return response()->json([
             'success' => true,

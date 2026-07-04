@@ -72,7 +72,7 @@
                                 <span class="input-group-text">{{ __(gs()->cur_text) }}</span>
                             </div>
                         </div>
-                        <x-viser-form identifier="act" identifierValue="wire_transfer" />
+                        <x-app-form identifier="act" identifierValue="wire_transfer" />
                         @include('Template::partials.otp_field')
                         <button type="submit" class="btn btn--base w-100 ">@lang('Submit')</button>
                     </form>

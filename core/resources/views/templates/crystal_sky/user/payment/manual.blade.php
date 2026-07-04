@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <form action="{{ route('user.deposit.manual.update') }}" method="POST" class="disableSubmission" enctype="multipart/form-data">
                         @csrf
-                        <x-viser-form identifier="id" identifierValue="{{ $data->gateway->form_id }}" />
+                        <x-app-form identifier="id" identifierValue="{{ $data->gateway->form_id }}" />
                         <button type="submit" class="btn btn--base w-100">@lang('Pay Now')</button>
                     </form>
                 </div>

@@ -36,6 +36,6 @@
     }
 @endphp
 
-<x-viser_table.table :data="$cards" :action="$action" :columns="$columns" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive"/>
+<x-data_table.table :data="$cards" :action="$action" :columns="$columns" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive"/>
 
 @endsection

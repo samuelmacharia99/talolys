@@ -65,7 +65,7 @@
                                 </p>
                             </div>
                         @endif
-                        <x-viser-form identifier="id" identifierValue="{{ $plan->form_id }}" />
+                        <x-app-form identifier="id" identifierValue="{{ $plan->form_id }}" />
                         <button type="submit" class="btn btn--base w-100">@lang('Apply')</button>
                     </form>
                 </div>

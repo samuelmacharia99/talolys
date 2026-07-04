@@ -15,7 +15,7 @@
                             </div>
                         @endif
 
-                        <x-viser-form identifier="id" identifierValue="{{ $withdraw->method->form->id }}" />
+                        <x-app-form identifier="id" identifierValue="{{ $withdraw->method->form->id }}" />
 
                         <button class="btn btn-md btn--base w-100" type="submit">@lang('Submit')</button>
                     </form>

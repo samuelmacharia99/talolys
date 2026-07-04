@@ -107,7 +107,7 @@
                 @if (!$account && gs('kv'))
                     <h4 class="card-title my-3 text-center"> @lang('KYC Data')</h4>
                     <div class="row">
-                        <x-viser-form identifier="act" identifierValue="kyc" />
+                        <x-app-form identifier="act" identifierValue="kyc" />
                     </div>
                 @endif
 

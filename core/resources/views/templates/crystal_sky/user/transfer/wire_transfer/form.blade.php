@@ -73,7 +73,7 @@
                             </div>
                             <span class="fw-bold @if(auth()->user()->balance > @$setting->minimum_limit) text--info @else text--danger @endif">@lang('Current Balance'): {{ showAmount(auth()->user()->balance) }}</span>
                         </div>
-                        <x-viser-form identifier="act" identifierValue="wire_transfer" />
+                        <x-app-form identifier="act" identifierValue="wire_transfer" />
                         @include('Template::partials.otp_field')
                         <button type="submit" class="btn btn--base w-100 ">@lang('Submit')</button>
                     </form>

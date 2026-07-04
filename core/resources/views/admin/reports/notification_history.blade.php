@@ -23,12 +23,12 @@
         ];
     @endphp
 
-    <x-viser_table.table :data="$logs" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive">
+    <x-data_table.table :data="$logs" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive">
         @slot('tbody')
             <tbody>
                 @forelse($logs as $log)
                     <tr>
-                        <x-viser_table.table-data-columns :renderColumns="$columns->whereIn('id', $visibleColumns)" :item="$log" />
+                        <x-data_table.table-data-columns :renderColumns="$columns->whereIn('id', $visibleColumns)" :item="$log" />
 
                             @can('admin.report.email.details')
                         <td>

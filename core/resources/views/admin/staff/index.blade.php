@@ -77,7 +77,7 @@
 
 
 
-    <x-viser_table.table :data="$allStaff" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
+    <x-data_table.table :data="$allStaff" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
 
     <x-confirmation-modal />
 

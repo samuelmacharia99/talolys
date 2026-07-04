@@ -78,7 +78,7 @@
         }
     @endphp
 
-    <x-viser_table.table :data="$users" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
+    <x-data_table.table :data="$users" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
 @endsection
 
 @if($users->total() > 0 && can('admin.users.notification.all.send'))

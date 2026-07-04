@@ -78,7 +78,7 @@
         }
     @endphp
 
-    <x-viser_table.table :data="$levels" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName"
+    <x-data_table.table :data="$levels" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName"
         :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" searchPlaceholder="Name" />
 
     <x-confirmation-modal />

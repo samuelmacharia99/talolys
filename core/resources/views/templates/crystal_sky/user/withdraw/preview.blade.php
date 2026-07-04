@@ -11,7 +11,7 @@
                                 echo $withdraw->method->description;
                             @endphp
                         </div>
-                        <x-viser-form identifier="id" identifierValue="{{ $withdraw->method->form->id }}" />
+                        <x-app-form identifier="id" identifierValue="{{ $withdraw->method->form->id }}" />
                         @if (auth()->user()->ts)
                             <div class="form-group">
                                 <label>@lang('Google Authenticator Code')</label>

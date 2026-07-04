@@ -6,7 +6,7 @@
                 <div class="card-body">
                     <form action="{{ route('user.kyc.submit') }}" method="post" enctype="multipart/form-data">
                         @csrf
-                        <x-viser-form identifier="act" identifierValue="kyc" />
+                        <x-app-form identifier="act" identifierValue="kyc" />
                         <button type="submit" class="btn btn--base w-100">@lang('Submit')</button>
                     </form>
                 </div>

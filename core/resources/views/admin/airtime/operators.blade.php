@@ -74,7 +74,7 @@
         }
     @endphp
 
-    <x-viser_table.table :data="$operators" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
+    <x-data_table.table :data="$operators" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
 
     @can('admin.airtime.country.status')
         <x-confirmation-modal />

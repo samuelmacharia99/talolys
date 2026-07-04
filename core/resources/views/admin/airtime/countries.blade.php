@@ -66,7 +66,7 @@
         }
     @endphp
 
-    <x-viser_table.table :data="$countries" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns"
+    <x-data_table.table :data="$countries" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns"
         class="table-responsive--md table-responsive" />
 
     @can('admin.airtime.country.status')

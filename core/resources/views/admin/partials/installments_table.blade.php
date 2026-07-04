@@ -1,4 +1,4 @@
-<div class="card b-radius--10 viser--table">
+<div class="card b-radius--10 data--table">
     <div class="card-body p-0">
         <div class="table-responsive--md table-responsive">
             <table class="table table--light style--two">

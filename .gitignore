@@ -1,4 +1,5 @@
 # Laravel core
+.env
 core/vendor/
 core/node_modules/
 core/.env

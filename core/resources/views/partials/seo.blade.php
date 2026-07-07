@@ -1,7 +1,13 @@
 @if ($seo)
+    @php
+        $seoKeywords = (isset($seoContents->keywords) && $seoContents->keywords) ? $seoContents->keywords : ($seo->keywords ?? []);
+        $seoKeywords = is_array($seoKeywords) ? $seoKeywords : (array) $seoKeywords;
+        $seoImagePath = $seoImage ?? ($seo->image ? getImage(getFilePath('seo') . '/' . $seo->image) : getImage(getFilePath('seo') . '/default.png'));
+        $seoImageExtension = pathinfo(parse_url($seoImagePath, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION) ?: 'png';
+    @endphp
     <meta name="title" Content="{{ gs()->siteName(__($pageTitle)) }}">
     <meta name="description" content="{{ isset($seoContents->description) && $seoContents->description ? $seoContents->description : $seo->description }}">
-    <meta name="keywords" content="{{ implode(',', ((isset($seoContents->keywords) && $seoContents->keywords) ? $seoContents->keywords : $seo->keywords)) }}">
+    <meta name="keywords" content="{{ implode(',', $seoKeywords) }}">
     <link rel="shortcut icon" href="{{ siteFavicon() }}" type="image/x-icon">
     <link rel="canonical" href="{{ url()->current() }}" />
 
@@ -23,7 +29,7 @@
     <meta property="og:description" content="{{ (isset($seoContents->social_description) && $seoContents->social_description) ? $seoContents->social_description : $seo->social_description }}">
     <meta property="og:image" content="{{ $seoImage ?? getImage(getFilePath('seo') . '/' . $seo->image) }}">
 
-    <meta property="og:image:type" content="image/{{ pathinfo($seoImage ?? getImage(getFilePath('seo')) . '/' . $seo->image)['extension'] }}">
+    <meta property="og:image:type" content="image/{{ $seoImageExtension }}">
     @php $socialImageSize = explode('x', getFileSize('seo')) @endphp
     <meta property="og:image:width" content="{{ $socialImageSize[0] }}">
     <meta property="og:image:height" content="{{ $socialImageSize[1] }}">

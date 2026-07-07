@@ -1,10 +1,11 @@
 @if (gs()->modules->loan)
     @php
         $loanContent = getContent('loan_plans.content', true);
-        $plans = App\Models\LoanPlan::active()
-            ->latest()
-            ->limit(3)
-            ->get();
+        try {
+            $plans = App\Models\LoanPlan::active()->latest()->limit(3)->get();
+        } catch (\Throwable $e) {
+            $plans = collect();
+        }
     @endphp
     @if ($loanContent && $plans->count())
         <section class="py-120 pricing section-bg-light bg-img" data-background-image="{{ asset(activeTemplate(true) . 'images/thumbs/pricing-bg.png') }}">

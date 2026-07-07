@@ -23,6 +23,7 @@ class FrontendSeeder extends Seeder
         $this->seedHowItWorks();
         $this->seedPartners();
         $this->seedKycContent();
+        $this->seedPlanSections();
 
         $this->command->info('Frontend content seeded with Kenya-focused banking content.');
     }
@@ -294,6 +295,24 @@ class FrontendSeeder extends Seeder
             'required' => 'Please complete your KYC verification to access all banking services.',
             'pending'  => 'Your KYC documents are under review. We will notify you once verification is complete.',
             'reject'   => 'Your KYC documents were rejected. Please review the reason and re-submit your documents.',
+        ]);
+    }
+
+    protected function seedPlanSections(): void
+    {
+        $this->upsertContent('fdr_plans.content', [
+            'heading'    => 'Fixed Deposit Plans',
+            'subheading' => 'Grow your savings with competitive interest rates',
+        ]);
+
+        $this->upsertContent('dps_plans.content', [
+            'heading'    => 'Deposit Pension Scheme',
+            'subheading' => 'Build disciplined savings with regular installments',
+        ]);
+
+        $this->upsertContent('loan_plans.content', [
+            'title'   => 'Loan Products',
+            'heading' => 'Flexible financing for individuals and businesses',
         ]);
     }
 }

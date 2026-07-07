@@ -5,9 +5,11 @@
         @include('Template::sections.banner')
     @endif
 
-    @if ($sections?->secs != null)
-        @foreach (json_decode($sections->secs) as $sec)
-            @include('Template::sections.' . $sec)
+    @if ($sections?->secs)
+        @foreach (json_decode($sections->secs, true) ?? [] as $sec)
+            @if (view()->exists('Template::sections.' . $sec))
+                @include('Template::sections.' . $sec)
+            @endif
         @endforeach
     @endif
 @endsection

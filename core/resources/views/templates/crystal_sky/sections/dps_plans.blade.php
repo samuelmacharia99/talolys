@@ -1,7 +1,11 @@
 @if (gs()->modules->dps)
     @php
         $content = getContent('dps_plans.content', true);
-        $plans = App\Models\DpsPlan::active()->orderBy('per_installment')->limit(3)->get();
+        try {
+            $plans = App\Models\DpsPlan::active()->orderBy('per_installment')->limit(3)->get();
+        } catch (\Throwable $e) {
+            $plans = collect();
+        }
     @endphp
 
     @if ($content && $plans->count())

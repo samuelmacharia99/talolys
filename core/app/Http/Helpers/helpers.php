@@ -702,9 +702,12 @@ function isManager() {
 }
 
 function checkIsOtpEnable() {
-    if (gs('modules')->otp_email || gs('modules')->otp_sms || auth()->user()->ts) {
+    $user = auth()->user();
+
+    if (gs('modules')->otp_email || gs('modules')->otp_sms || ($user && $user->ts)) {
         return 1;
     }
+
     return 0;
 }
 

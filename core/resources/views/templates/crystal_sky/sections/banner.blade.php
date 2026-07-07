@@ -1,6 +1,7 @@
 @php
     $banner = getContent('banner.content', true);
 @endphp
+@if ($banner)
 <section class="banner-section section-overlay">
     <div class="banner-bg-masks-group">
         <span class="bg-mask bg-circle"></span>
@@ -61,6 +62,7 @@
         </div>
     </div>
 </section>
+@endif
 
 @push('style')
     <style>

@@ -1,10 +1,11 @@
 @if (gs()->modules->fdr)
     @php
         $content = getContent('fdr_plans.content', true);
-        $plans = App\Models\FdrPlan::active()
-            ->latest()
-            ->limit(3)
-            ->get();
+        try {
+            $plans = App\Models\FdrPlan::active()->latest()->limit(3)->get();
+        } catch (\Throwable $e) {
+            $plans = collect();
+        }
     @endphp
 
     @if ($content && $plans->count())

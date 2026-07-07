@@ -458,7 +458,48 @@ function gs($key = null) {
             'secondary_color'  => '00c2ff',
             'account_no_prefix'=> 'TLY',
             'account_no_length'=> 16,
+            'modules'          => (object) [
+                'deposit'            => 1,
+                'withdraw'           => 1,
+                'dps'                => 1,
+                'fdr'                => 1,
+                'loan'               => 1,
+                'own_bank'           => 1,
+                'other_bank'         => 1,
+                'otp_email'          => 1,
+                'otp_sms'            => 0,
+                'branch_create_user' => 1,
+                'wire_transfer'      => 1,
+                'referral_system'    => 0,
+                'airtime'            => 0,
+                'virtual_card'       => 0,
+                'wallet'             => 0,
+                'account_level'      => 0,
+                'reward_point'       => 0,
+            ],
         ]);
+    }
+
+    if (!$general->modules) {
+        $general->modules = (object) [
+            'deposit'            => 1,
+            'withdraw'           => 1,
+            'dps'                => 1,
+            'fdr'                => 1,
+            'loan'               => 1,
+            'own_bank'           => 1,
+            'other_bank'         => 1,
+            'otp_email'          => 1,
+            'otp_sms'            => 0,
+            'branch_create_user' => 1,
+            'wire_transfer'      => 1,
+            'referral_system'    => 0,
+            'airtime'            => 0,
+            'virtual_card'       => 0,
+            'wallet'             => 0,
+            'account_level'      => 0,
+            'reward_point'       => 0,
+        ];
     }
 
     if ($key) {

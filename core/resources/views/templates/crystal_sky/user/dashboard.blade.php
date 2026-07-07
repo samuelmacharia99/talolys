@@ -3,6 +3,9 @@
     @if ($user->kv != Status::KYC_VERIFIED)
         @php
             $kyc = getContent('kyc.content', true);
+            $kycRequired = data_get($kyc, 'data_values.required', 'Please complete your KYC verification to access all banking services.');
+            $kycPending = data_get($kyc, 'data_values.pending', 'Your KYC documents are under review. We will notify you once verification is complete.');
+            $kycReject = data_get($kyc, 'data_values.reject', 'Your KYC documents were rejected. Please review the reason and re-submit your documents.');
         @endphp
 
         @if (auth()->user()->kv == Status::KYC_UNVERIFIED && auth()->user()->kyc_rejection_reason)
@@ -12,20 +15,20 @@
                     <button class="btn btn--dark btn--sm" data-bs-toggle="modal" data-bs-target="#kycRejectionReason">@lang('Show Reason')</button>
                 </div>
                 <hr>
-                <p class="mb-2">{{ __(@$kyc->data_values->reject) }} <a href="{{ route('user.kyc.form') }}">@lang('Click Here to Re-submit Documents').</a></p>
+                <p class="mb-2">{{ __($kycReject) }} <a href="{{ route('user.kyc.form') }}">@lang('Click Here to Re-submit Documents').</a></p>
                 <a href="{{ route('user.kyc.data') }}">@lang('See KYC Data')</a>
             </div>
         @elseif(auth()->user()->kv == Status::KYC_UNVERIFIED)
             <div class="alert mb-4 alert--danger" role="alert">
                 <h4 class="text--primary mb-0">@lang('KYC Verification required')</h4>
                 <hr>
-                <p>{{ __(@$kyc->data_values->required) }} <a href="{{ route('user.kyc.form') }}">@lang('Click Here to Submit Documents')</a></p>
+                <p>{{ __($kycRequired) }} <a href="{{ route('user.kyc.form') }}">@lang('Click Here to Submit Documents')</a></p>
             </div>
         @elseif(auth()->user()->kv == Status::KYC_PENDING)
             <div class="alert mb-4 alert--warning" role="alert">
                 <h4 class="text--warning mb-0">@lang('KYC Verification pending')</h4>
                 <hr>
-                <p>{{ __(@$kyc->data_values->pending) }} <a href="{{ route('user.kyc.data') }}">@lang('See KYC Data')</a></p>
+                <p>{{ __($kycPending) }} <a href="{{ route('user.kyc.data') }}">@lang('See KYC Data')</a></p>
             </div>
         @endif
     @endif

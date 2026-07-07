@@ -22,6 +22,7 @@ class FrontendSeeder extends Seeder
         $this->seedSocialLinks();
         $this->seedHowItWorks();
         $this->seedPartners();
+        $this->seedKycContent();
 
         $this->command->info('Frontend content seeded with Kenya-focused banking content.');
     }
@@ -284,6 +285,15 @@ class FrontendSeeder extends Seeder
 
         $this->upsertContent('subscribe.content', [
             'heading' => 'Stay Updated with Talolys',
+        ]);
+    }
+
+    protected function seedKycContent(): void
+    {
+        $this->upsertContent('kyc.content', [
+            'required' => 'Please complete your KYC verification to access all banking services.',
+            'pending'  => 'Your KYC documents are under review. We will notify you once verification is complete.',
+            'reject'   => 'Your KYC documents were rejected. Please review the reason and re-submit your documents.',
         ]);
     }
 }

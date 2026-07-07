@@ -297,7 +297,7 @@ class ManageUsersController extends Controller {
     }
 
     public function login($id) {
-        Auth::loginUsingId($id);
+        Auth::guard('web')->loginUsingId($id);
         return to_route('user.home');
     }
 

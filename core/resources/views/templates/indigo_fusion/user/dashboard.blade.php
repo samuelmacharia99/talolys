@@ -1,13 +1,13 @@
 @extends('Template::layouts.master')
-@php
-    $kyc = getContent('kyc_content.content', true);
-@endphp
 @section('content')
     <div class="row justify-content-center gy-4">
         @if ($user->kv != Status::KYC_VERIFIED)
             <div class="col-lg-12">
                 @php
                     $kyc = getContent('kyc.content', true);
+                    $kycRequired = data_get($kyc, 'data_values.required', 'Please complete your KYC verification to access all banking services.');
+                    $kycPending = data_get($kyc, 'data_values.pending', 'Your KYC documents are under review. We will notify you once verification is complete.');
+                    $kycReject = data_get($kyc, 'data_values.reject', 'Your KYC documents were rejected. Please review the reason and re-submit your documents.');
                 @endphp
                 @if ($user->kv == Status::KYC_UNVERIFIED && auth()->user()->kyc_rejection_reason)
                     <div class="card-widget section--bg2" role="alert">
@@ -16,7 +16,7 @@
                             <button class="btn btn--base btn-sm" data-bs-toggle="modal" data-bs-target="#kycRejectionReason">@lang('Show Reason')</button>
                         </div>
                         <hr>
-                        <p class="text-white mb-2">{{ __(@$kyc->data_values->reject) }}</p>
+                        <p class="text-white mb-2">{{ __($kycReject) }}</p>
 
                         <a href="{{ route('user.kyc.form') }}">@lang('Click Here to Re-submit Documents')</a>
                         <br>
@@ -26,13 +26,13 @@
                     <div class="card-widget section--bg2" role="alert">
                         <h4 class="text--base">@lang('KYC Verification required')</h4>
                         <hr>
-                        <p class="mb-0 text-white">{{ __(@$kyc->data_values->required) }} <a href="{{ route('user.kyc.form') }}" class="text--base">@lang('Click Here to Verify')</a></p>
+                        <p class="mb-0 text-white">{{ __($kycRequired) }} <a href="{{ route('user.kyc.form') }}" class="text--base">@lang('Click Here to Verify')</a></p>
                     </div>
                 @elseif(auth()->user()->kv == Status::KYC_PENDING)
                     <div class="card-widget section--bg2" role="alert">
                         <h4 class="text--base">@lang('KYC Verification pending')</h4>
                         <hr>
-                        <p class="mb-0 text-white">{{ __(@$kyc->data_values->pending) }} <a href="{{ route('user.kyc.data') }}" class="text--base">@lang('See KYC Data')</a></p>
+                        <p class="mb-0 text-white">{{ __($kycPending) }} <a href="{{ route('user.kyc.data') }}" class="text--base">@lang('See KYC Data')</a></p>
                     </div>
                 @endif
             </div>

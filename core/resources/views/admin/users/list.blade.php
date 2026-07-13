@@ -47,11 +47,13 @@
                 ],
                 [
                     'name' => 'Login As User',
-                    'link' => 'route("admin.users.login", $item->id)',
                     'show' => can('admin.users.login'),
+                    'class' => 'confirmationBtn',
+                    'icon' => 'la la-sign-in-alt',
                     'attributes' => [
-                        'target' => "json_encode('blank')"
-                    ]
+                        'data-action' => 'route(\'admin.users.login\', $item->id)',
+                        'data-question' => 'trans("Are you sure you want to login as this user? Your admin session will end.")',
+                    ],
                 ],
                 [
                     'name' => 'Login History',
@@ -79,6 +81,8 @@
     @endphp
 
     <x-data_table.table :data="$users" :columns="$columns" :action="$action" :columnConfig="true" :tableName="$tableName" :visibleColumns="$visibleColumns" class="table-responsive--md table-responsive" />
+
+    <x-confirmation-modal />
 @endsection
 
 @if($users->total() > 0 && can('admin.users.notification.all.send'))

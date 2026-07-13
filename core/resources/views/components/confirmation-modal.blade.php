@@ -26,7 +26,8 @@
     <script>
         (function($) {
             "use strict";
-            $(document).on('click', '.confirmationBtn', function() {
+            $(document).on('click', '.confirmationBtn', function(e) {
+                e.preventDefault();
                 var modal = $('#confirmationModal');
                 let data = $(this).data();
                 modal.find('.question').text(`${data.question}`);

@@ -1,4 +1,4 @@
-@if (gs()->modules->loan)
+@if (@gs()->modules->loan)
     @php
         $content = getContent('loan_plans.content', true);
         $totalPlans = App\Models\LoanPlan::active()->count();

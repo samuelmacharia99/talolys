@@ -20,6 +20,14 @@ use Carbon\Carbon;
 
 class CronController extends Controller {
     public function cron() {
+        $secret = config('app.cron_secret') ?: env('CRON_SECRET');
+        if (!$secret && app()->environment('production')) {
+            abort(403, 'CRON_SECRET is not configured');
+        }
+        if ($secret && !hash_equals((string) $secret, (string) request('secret'))) {
+            abort(403, 'Invalid cron secret');
+        }
+
         $general            = gs();
         $general->last_cron = now();
         $general->save();

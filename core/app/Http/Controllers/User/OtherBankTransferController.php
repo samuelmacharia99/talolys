@@ -59,65 +59,71 @@ class OtherBankTransferController extends Controller {
     }
 
     public function confirm() {
-        $verification = OtpVerification::find(sessionVerificationId());
-        $beneficiary  = $verification->verifiable;
-        $bank         = $beneficiary->beneficiaryOf;
+        return \Illuminate\Support\Facades\DB::transaction(function () {
+            $verification = OtpVerification::find(sessionVerificationId());
+            $beneficiary  = $verification->verifiable;
+            $bank         = $beneficiary->beneficiaryOf;
 
-        OTPManager::checkVerificationData($verification, Beneficiary::class);
+            OTPManager::checkVerificationData($verification, Beneficiary::class);
+            OTPManager::markActionCompleted($verification);
 
-        if ($beneficiary->beneficiary_type != OtherBank::class) {
-            $notify[] = ['error', 'Invalid session data'];
-            return to_route('user.home')->withNotify($notify);
-        }
+            if ($beneficiary->beneficiary_type != OtherBank::class) {
+                $notify[] = ['error', 'Invalid session data'];
+                return to_route('user.home')->withNotify($notify);
+            }
 
-        $sender = auth()->user();
-        $amount = $verification->additional_data->amount;
-        $wallet = $verification->wallet ?? null;
-        $rate   = $wallet ? $wallet->currency->currency_rate : 1;
+            $sender = \App\Models\User::where('id', auth()->id())->lockForUpdate()->first();
+            $amount = $verification->additional_data->amount;
+            $wallet = $verification->wallet ?? null;
+            if ($wallet) {
+                $wallet = Wallet::where('id', $wallet->id)->lockForUpdate()->first();
+            }
+            $rate   = $wallet ? $wallet->currency->currency_rate : 1;
 
-        if($wallet) {
-            $this->checkBankAllowCurrency($wallet->currency->currency, $beneficiary?->beneficiaryOf?->supported_currency ?? null);
-        }
+            if ($wallet) {
+                $this->checkBankAllowCurrency($wallet->currency->currency, $beneficiary?->beneficiaryOf?->supported_currency ?? null);
+            }
 
-        $this->checkTransferAvailability($amount, $bank, $wallet);
+            $this->checkTransferAvailability($amount, $bank, $wallet);
 
-        $charge      = $this->charge($amount, $bank, $wallet);
-        $finalAmount = $amount + $charge;
+            $charge      = $this->charge($amount, $bank, $wallet);
+            $finalAmount = $amount + $charge;
 
-        $transfer                       = new BalanceTransfer();
-        $transfer->user_id              = $sender->id;
-        $transfer->wallet_id            = $wallet ? $wallet->id : 0;
-        $transfer->trx                  = getTrx();
-        $transfer->beneficiary_id       = $beneficiary->id;
-        $transfer->amount               = $amount;
-        $transfer->base_currency_amount = $amount / $rate;
-        $transfer->charge               = $charge;
-        $transfer->status               = Status::TRANSFER_PENDING;
-        $transfer->save();
+            $transfer                       = new BalanceTransfer();
+            $transfer->user_id              = $sender->id;
+            $transfer->wallet_id            = $wallet ? $wallet->id : 0;
+            $transfer->trx                  = getTrx();
+            $transfer->beneficiary_id       = $beneficiary->id;
+            $transfer->amount               = $amount;
+            $transfer->base_currency_amount = $amount / $rate;
+            $transfer->charge               = $charge;
+            $transfer->status               = Status::TRANSFER_PENDING;
+            $transfer->save();
 
-        if ($wallet) {
-            $wallet->balance -= $finalAmount;
-            $wallet->save();
-        } else {
-            $sender->balance -= $finalAmount;
-            $sender->save();
-        }
+            if ($wallet) {
+                $wallet->balance -= $finalAmount;
+                $wallet->save();
+            } else {
+                $sender->balance -= $finalAmount;
+                $sender->save();
+            }
 
-        $this->sendingTransaction($transfer, $sender, $wallet);
+            $this->sendingTransaction($transfer, $sender, $wallet);
 
-        $adminNotification            = new AdminNotification();
-        $adminNotification->user_id   = $sender->id;
-        $adminNotification->title     = 'New bank transfer request';
-        $adminNotification->click_url = urlPath('admin.transfers.details', $transfer->id);
-        $adminNotification->save();
+            $adminNotification            = new AdminNotification();
+            $adminNotification->user_id   = $sender->id;
+            $adminNotification->title     = 'New bank transfer request';
+            $adminNotification->click_url = urlPath('admin.transfers.details', $transfer->id);
+            $adminNotification->save();
 
-        session()->forget('otp_id');
+            session()->forget('otp_id');
 
-        $shortCodes = $this->shortCodes($transfer, $sender, $bank, $wallet);
-        notify($sender, $wallet ? 'WALLET_OTHER_BANK_TRANSFER_REQUEST_SEND' : 'OTHER_BANK_TRANSFER_REQUEST_SEND', $shortCodes);
+            $shortCodes = $this->shortCodes($transfer, $sender, $bank, $wallet);
+            notify($sender, $wallet ? 'WALLET_OTHER_BANK_TRANSFER_REQUEST_SEND' : 'OTHER_BANK_TRANSFER_REQUEST_SEND', $shortCodes);
 
-        $notify[] = ['success', "Request submitted successfully"];
-        return to_route('user.transfer.details', $transfer->trx)->withNotify($notify);
+            $notify[] = ['success', "Request submitted successfully"];
+            return to_route('user.transfer.details', $transfer->trx)->withNotify($notify);
+        });
     }
 
     private function checkTransferAvailability($amount, $bank, $wallet = null) {

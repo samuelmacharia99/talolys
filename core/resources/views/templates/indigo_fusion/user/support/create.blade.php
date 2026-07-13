@@ -87,11 +87,11 @@
         <a href="{{ route('user.profile.setting') }}">@lang('Profile')</a>
     </li>
 
-    @if (gs()->modules->referral_system)
+    @if (@gs()->modules->referral_system)
         <li><a href="{{ route('user.referral.users') }}">@lang('Referral')</a></li>
     @endif
 
-     @if (gs()->modules->virtual_card)
+     @if (@gs()->modules->virtual_card)
         <li><a href="{{ route('user.vcard.index') }}">@lang('Virtual Cards')</a></li>
     @endif
 

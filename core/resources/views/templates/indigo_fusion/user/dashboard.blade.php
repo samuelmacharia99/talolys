@@ -38,7 +38,7 @@
             </div>
         @endif
 
-        @if (gs()->modules->virtual_card)
+        @if (@gs()->modules->virtual_card)
             @php
                 $vcardContent = getContent('vcard_cta.content', true);
             @endphp
@@ -114,7 +114,7 @@
                 </div>
             </a>
         </div>
-        @if (gs()->modules->fdr)
+        @if (@gs()->modules->fdr)
             <div class="col-lg-4 col-md-6">
                 <a href="{{ route('user.fdr.list') }}" class="w-100 h-100">
                     <div class="d-widget section--bg2 d-flex flex-wrap align-items-center rounded-3 bg_img h-100" style="background-image: url(' {{ asset(activeTemplate(true) . 'images/elements/card-bg.png') }} ');">
@@ -129,7 +129,7 @@
                 </a>
             </div>
         @endif
-        @if (gs()->modules->dps)
+        @if (@gs()->modules->dps)
             <div class="col-lg-4 col-md-6">
                 <a href="{{ route('user.dps.list') }}" class="w-100 h-100">
                     <div class="d-widget section--bg2 d-flex flex-wrap align-items-center rounded-3 bg_img h-100" style="background-image: url('{{ asset(activeTemplate(true) . 'images/elements/card-bg.png') }} ');">
@@ -144,7 +144,7 @@
                 </a>
             </div>
         @endif
-        @if (gs()->modules->loan)
+        @if (@gs()->modules->loan)
             <div class="col-lg-4 col-md-6">
                 <a href="{{ route('user.loan.list') }}" class="w-100 h-100">
                     <div class="d-widget section--bg2 d-flex flex-wrap align-items-center rounded-3 bg_img h-100" style="background-image: url('{{ asset(activeTemplate(true) . 'images/elements/card-bg.png') }} ');">
@@ -161,7 +161,7 @@
         @endif
     </div>
 
-    @if (gs()->modules->referral_system)
+    @if (@gs()->modules->referral_system)
         <div class="row gy-4 mt-3">
             <div class="col-12">
                 <div class="d-widget d-flex flex-wrap align-items-center rounded-3">

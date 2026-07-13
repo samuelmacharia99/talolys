@@ -296,8 +296,31 @@ class ManageUsersController extends Controller {
         return back()->withNotify($notify);
     }
 
-    public function login($id) {
-        Auth::guard('web')->loginUsingId($id);
+    public function login(Request $request, $id) {
+        $user = User::findOrFail($id);
+        $admin = auth()->guard('admin')->user();
+
+        // Capture admin identity before regenerating the session.
+        $adminId = $admin->id ?? null;
+        $adminUsername = $admin->username ?? 'admin';
+
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        Auth::guard('web')->loginUsingId($user->id);
+        $request->session()->regenerate();
+
+        session()->put('impersonator_id', $adminId);
+        session()->put('impersonator_username', $adminUsername);
+        session()->put('impersonating', true);
+
+        $adminNotification            = new \App\Models\AdminNotification();
+        $adminNotification->user_id   = $user->id;
+        $adminNotification->title     = 'Admin "' . $adminUsername . '" started impersonating user';
+        $adminNotification->click_url = urlPath('admin.users.detail', $user->id);
+        $adminNotification->save();
+
         return to_route('user.home');
     }
 

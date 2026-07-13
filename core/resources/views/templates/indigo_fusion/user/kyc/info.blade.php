@@ -24,7 +24,7 @@
                             {{ $user->kyc_rejection_reason }}
                         </p>
 
-                        {{ __(@$kyc->data_values->reject) }} <a href="{{ route('user.kyc.form') }}">@lang('Click Here to Re-submit KYC Your Information').</a></p>
+                        {{ __(@$kyc->data_values->reject ?? 'Your KYC was rejected.') }} <a href="{{ route('user.kyc.form') }}">@lang('Click Here to Re-submit KYC Your Information').</a></p>
                     </div>
                 </div>
             @endif

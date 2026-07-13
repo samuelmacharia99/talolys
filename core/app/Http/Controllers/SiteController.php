@@ -131,10 +131,9 @@ class SiteController extends Controller
 
     public function cookiePolicy()
     {
-        $cookieContent = Frontend::where('data_keys', 'cookie.data')->first();
-        abort_if($cookieContent->data_values->status != Status::ENABLE, 404);
+        $cookie = Frontend::where('data_keys', 'cookie.data')->first();
+        abort_if(!$cookie || @$cookie->data_values->status != Status::ENABLE, 404);
         $pageTitle = 'Cookie Policy';
-        $cookie    = Frontend::where('data_keys', 'cookie.data')->first();
         return view('Template::cookie', compact('pageTitle', 'cookie'));
     }
 

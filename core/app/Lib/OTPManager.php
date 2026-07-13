@@ -207,6 +207,13 @@ class OTPManager
      **/
     public static function checkVerificationData($verification, $verifiableType, $apiRequest = false, $validator = null)
     {
+        if (!$verification) {
+            if ($apiRequest) {
+                return addCustomValidation($validator, 'error', 'Verification not found');
+            }
+            throw ValidationException::withMessages(['error' => 'Verification not found']);
+        }
+
         if ($verification->user_id != auth()->id()) {
             if ($apiRequest) {
                 return addCustomValidation($validator, 'error', 'Unauthorized action');
@@ -222,7 +229,18 @@ class OTPManager
                 throw ValidationException::withMessages(['error' => 'Invalid session data']);
             }
         }
-        if (!$verification->used_at && checkIsOtpEnable()) {
+
+        $additional = (array) ($verification->additional_data ?? []);
+        if (!empty($additional['action_completed_at'])) {
+            if ($apiRequest) {
+                return addCustomValidation($validator, 'error', 'This action has already been completed');
+            }
+            throw ValidationException::withMessages(['error' => 'This action has already been completed']);
+        }
+
+        // When OTP is enabled, used_at must be set after OTP submit.
+        // When OTP is disabled, used_at may be null until the action is consumed.
+        if (checkIsOtpEnable() && !$verification->used_at) {
             if ($apiRequest) {
                 return addCustomValidation($validator, 'error', 'The user is not verified by a valid OTP code for this action');
             } else {
@@ -231,5 +249,25 @@ class OTPManager
         }
 
         return true;
+    }
+
+    /**
+     * Mark a verification as fully consumed so confirm/apply cannot be replayed.
+     */
+    public static function markActionCompleted(OtpVerification $verification): void
+    {
+        $verification = OtpVerification::where('id', $verification->id)->lockForUpdate()->firstOrFail();
+
+        $additional = (array) ($verification->additional_data ?? []);
+        if (!empty($additional['action_completed_at'])) {
+            throw ValidationException::withMessages(['error' => 'This action has already been completed']);
+        }
+
+        $additional['action_completed_at'] = now()->toDateTimeString();
+        $verification->additional_data = $additional;
+        if (!$verification->used_at) {
+            $verification->used_at = now();
+        }
+        $verification->save();
     }
 }

@@ -54,36 +54,39 @@ class WithdrawController extends Controller {
     }
 
     public function withdrawStore() {
-        $verification = OtpVerification::find(sessionVerificationId());
-        OTPManager::checkVerificationData($verification, WithdrawMethod::class);
+        return \Illuminate\Support\Facades\DB::transaction(function () {
+            $verification = OtpVerification::find(sessionVerificationId());
+            OTPManager::checkVerificationData($verification, WithdrawMethod::class);
+            OTPManager::markActionCompleted($verification);
 
-        $method = $verification->verifiable;
-        $amount = $verification->additional_data->amount;
-        $user   = auth()->user();
+            $method = $verification->verifiable;
+            $amount = $verification->additional_data->amount;
+            $user   = \App\Models\User::where('id', auth()->id())->lockForUpdate()->first();
 
-        if ($user->balance < $amount) {
-            $notify[] = ['error', 'Sorry! You don\'t have sufficient balance'];
-            return to_route('user.withdraw')->withNotify($notify);
-        }
+            if ($user->balance < $amount) {
+                $notify[] = ['error', 'Sorry! You don\'t have sufficient balance'];
+                return to_route('user.withdraw')->withNotify($notify);
+            }
 
-        $charge      = $method->fixed_charge + ($amount * $method->percent_charge / 100);
-        $afterCharge = $amount - $charge;
-        $finalAmount = $afterCharge * $method->rate;
+            $charge      = $method->fixed_charge + ($amount * $method->percent_charge / 100);
+            $afterCharge = $amount - $charge;
+            $finalAmount = $afterCharge * $method->rate;
 
-        $withdraw               = new Withdrawal();
-        $withdraw->method_id    = $method->id;
-        $withdraw->user_id      = $user->id;
-        $withdraw->amount       = $amount;
-        $withdraw->currency     = $method->currency;
-        $withdraw->rate         = $method->rate;
-        $withdraw->charge       = $charge;
-        $withdraw->final_amount = $finalAmount;
-        $withdraw->after_charge = $afterCharge;
-        $withdraw->trx          = getTrx();
-        $withdraw->save();
+            $withdraw               = new Withdrawal();
+            $withdraw->method_id    = $method->id;
+            $withdraw->user_id      = $user->id;
+            $withdraw->amount       = $amount;
+            $withdraw->currency     = $method->currency;
+            $withdraw->rate         = $method->rate;
+            $withdraw->charge       = $charge;
+            $withdraw->final_amount = $finalAmount;
+            $withdraw->after_charge = $afterCharge;
+            $withdraw->trx          = getTrx();
+            $withdraw->save();
 
-        session()->put('wtrx', $withdraw->trx);
-        return to_route('user.withdraw.preview');
+            session()->put('wtrx', $withdraw->trx);
+            return to_route('user.withdraw.preview');
+        });
     }
 
     public function withdrawPreview() {
@@ -106,50 +109,52 @@ class WithdrawController extends Controller {
         $request->validate($validationRule);
         $userData = $formProcessor->processFormData($request, $formData);
 
-        $user = auth()->user();
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($withdraw, $userData) {
+            $withdraw = Withdrawal::where('id', $withdraw->id)->where('status', Status::PAYMENT_INITIATE)->lockForUpdate()->firstOrFail();
+            $user     = \App\Models\User::where('id', auth()->id())->lockForUpdate()->first();
 
+            if ($withdraw->amount > $user->balance) {
+                $notify[] = ['error', 'Insufficient balance'];
+                return back()->withNotify($notify);
+            }
 
-        if ($withdraw->amount > $user->balance) {
-            $notify[] = ['error', 'Insufficient balance'];
-            return back()->withNotify($notify);
-        }
+            $withdraw->status               = Status::PAYMENT_PENDING;
+            $withdraw->withdraw_information = $userData;
+            $withdraw->save();
+            $user->balance -= $withdraw->amount;
+            $user->save();
 
-        $withdraw->status               = Status::PAYMENT_PENDING;
-        $withdraw->withdraw_information = $userData;
-        $withdraw->save();
-        $user->balance -= $withdraw->amount;
-        $user->save();
+            $transaction               = new Transaction();
+            $transaction->user_id      = $withdraw->user_id;
+            $transaction->amount       = $withdraw->amount;
+            $transaction->post_balance = $user->balance;
+            $transaction->charge       = $withdraw->charge;
+            $transaction->trx_type     = '-';
+            $transaction->details      = showAmount($withdraw->final_amount) . ' ' . $withdraw->currency . ' Withdraw Via ' . $withdraw->method->name;
+            $transaction->trx          = $withdraw->trx;
+            $transaction->remark       = 'withdraw';
+            $transaction->save();
 
-        $transaction               = new Transaction();
-        $transaction->user_id      = $withdraw->user_id;
-        $transaction->amount       = $withdraw->amount;
-        $transaction->post_balance = $user->balance;
-        $transaction->charge       = $withdraw->charge;
-        $transaction->trx_type     = '-';
-        $transaction->details      = showAmount($withdraw->final_amount) . ' ' . $withdraw->currency . ' Withdraw Via ' . $withdraw->method->name;
-        $transaction->trx          = $withdraw->trx;
-        $transaction->remark       = 'withdraw';
-        $transaction->save();
+            $adminNotification            = new AdminNotification();
+            $adminNotification->user_id   = $user->id;
+            $adminNotification->title     = 'New withdraw request from ' . $user->username;
+            $adminNotification->click_url = urlPath('admin.withdraw.data.details', $withdraw->id);
+            $adminNotification->save();
 
-        $adminNotification            = new AdminNotification();
-        $adminNotification->user_id   = $user->id;
-        $adminNotification->title     = 'New withdraw request from ' . $user->username;
-        $adminNotification->click_url = urlPath('admin.withdraw.data.details', $withdraw->id);
-        $adminNotification->save();
+            notify($user, 'WITHDRAW_REQUEST', [
+                'method_name' => $withdraw->method->name,
+                'method_currency' => $withdraw->currency,
+                'method_amount' => showAmount($withdraw->final_amount, currencyFormat: false),
+                'amount' => showAmount($withdraw->amount, currencyFormat: false),
+                'charge' => showAmount($withdraw->charge, currencyFormat: false),
+                'rate' => showAmount($withdraw->rate, currencyFormat: false),
+                'trx' => $withdraw->trx,
+                'post_balance' => showAmount($user->balance, currencyFormat: false),
+            ]);
 
-        notify($user, 'WITHDRAW_REQUEST', [
-            'method_name' => $withdraw->method->name,
-            'method_currency' => $withdraw->currency,
-            'method_amount' => showAmount($withdraw->final_amount, currencyFormat: false),
-            'amount' => showAmount($withdraw->amount, currencyFormat: false),
-            'charge' => showAmount($withdraw->charge, currencyFormat: false),
-            'rate' => showAmount($withdraw->rate, currencyFormat: false),
-            'trx' => $withdraw->trx,
-            'post_balance' => showAmount($user->balance, currencyFormat: false),
-        ]);
-
-        $notify[] = ['success', 'Withdraw request sent successfully'];
-        return to_route('user.withdraw.history')->withNotify($notify);
+            $notify[] = ['success', 'Withdraw request sent successfully'];
+            return to_route('user.withdraw.history')->withNotify($notify);
+        });
     }
 
 

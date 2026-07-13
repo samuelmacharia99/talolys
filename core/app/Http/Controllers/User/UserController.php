@@ -131,7 +131,8 @@ class UserController extends Controller {
     public function kycData() {
         $user      = auth()->user();
         $pageTitle = 'KYC Data';
-        return view('Template::user.kyc.info', compact('pageTitle', 'user'));
+        $kyc       = getContent('kyc.content', true);
+        return view('Template::user.kyc.info', compact('pageTitle', 'user', 'kyc'));
     }
 
     public function kycSubmit(Request $request) {

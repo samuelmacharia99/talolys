@@ -1,4 +1,4 @@
-@if (gs()->modules->fdr)
+@if (@gs()->modules->fdr)
     @php
         $content = getContent('fdr_plans.content', true);
         try {

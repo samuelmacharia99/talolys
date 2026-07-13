@@ -44,7 +44,7 @@
                 <form action="{{ route('user.register') }}" method="POST" class="verify-gcaptcha account-form">
                     @csrf
                     <div class="row">
-                        @if (session()->get('reference') != null && gs()->modules->referral_system)
+                        @if (session()->get('reference') != null && @gs()->modules->referral_system)
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="referenceBy" class="form-label label">@lang('Referred by')</label>

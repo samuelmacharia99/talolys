@@ -20,6 +20,13 @@
 @php echo loadExtension('google-analytics') @endphp
 
 <body>
+    @if (session('impersonating'))
+        <div class="alert alert-warning text-center mb-0 rounded-0 py-2" style="position:relative;z-index:9999;">
+            @lang('You are impersonating') <strong>{{ auth()->user()->username }}</strong>
+            @lang('as admin') <strong>{{ session('impersonator_username') }}</strong>.
+            <a href="{{ route('user.logout') }}" class="alert-link">@lang('End session')</a>
+        </div>
+    @endif
 
     <div class="preloader">
         <div class="dl">

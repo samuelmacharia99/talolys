@@ -1,7 +1,7 @@
 @extends('Template::user.transfer.layout')
 @section('transfer-content')
     <div class="card custom--card overflow-hidden">
-        @if (gs()->modules->own_bank)
+        @if (@gs()->modules->own_bank)
             <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
                 <h6 class="card-title mb-0">@lang('Beneficiaries')</h6>
 

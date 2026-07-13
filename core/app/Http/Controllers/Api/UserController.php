@@ -126,6 +126,10 @@ class UserController extends Controller {
             return responseError('already_verified', $notify);
         }
         $form = Form::where('act', 'kyc')->first();
+        if (!$form) {
+            $notify[] = 'KYC form is not configured yet';
+            return responseError('kyc_form_missing', $notify);
+        }
         $notify[] = 'KYC field is below';
         return responseSuccess('kyc_form', $notify, ['form' => $form->form_data]);
     }

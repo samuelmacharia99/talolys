@@ -70,69 +70,73 @@ class DpsController extends Controller {
     }
 
     public function confirm($id) {
-        $verification = OtpVerification::find($id);
-        OTPManager::checkVerificationData($verification, DpsPlan::class);
-        $plan   = $verification->verifiable;
-        $amount = $plan->per_installment + 0;
-        $user   = auth()->user();
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+            $verification = OtpVerification::find($id);
+            OTPManager::checkVerificationData($verification, DpsPlan::class);
+            OTPManager::markActionCompleted($verification);
 
-        if ($user->balance < $amount) {
-            $notify[] = ['error', 'You must have at least one installment amount in your account'];
-            return redirect()->route('user.dps.plans')->withNotify($notify);
-        }
+            $plan   = $verification->verifiable;
+            $amount = $plan->per_installment + 0;
+            $user   = \App\Models\User::where('id', auth()->id())->lockForUpdate()->first();
 
-        $percentCharge = $plan->per_installment * $plan->percent_charge / 100;
-        $charge        = $plan->fixed_charge + $percentCharge;
+            if ($user->balance < $amount) {
+                $notify[] = ['error', 'You must have at least one installment amount in your account'];
+                return redirect()->route('user.dps.plans')->withNotify($notify);
+            }
 
-        $dps                         = new Dps();
-        $dps->user_id                = $user->id;
-        $dps->plan_id                = $plan->id;
-        $dps->dps_number             = getTrx();
-        $dps->interest_rate          = $plan->interest_rate;
-        $dps->per_installment        = $plan->per_installment;
-        $dps->total_installment      = $plan->total_installment;
-        $dps->given_installment      = 1;
-        $dps->installment_interval   = $plan->installment_interval;
-        $dps->delay_value            = $plan->delay_value;
-        $dps->charge_per_installment = $charge;
-        $dps->save();
+            $percentCharge = $plan->per_installment * $plan->percent_charge / 100;
+            $charge        = $plan->fixed_charge + $percentCharge;
 
-        $user->balance -= $amount;
-        $user->save();
+            $dps                         = new Dps();
+            $dps->user_id                = $user->id;
+            $dps->plan_id                = $plan->id;
+            $dps->dps_number             = getTrx();
+            $dps->interest_rate          = $plan->interest_rate;
+            $dps->per_installment        = $plan->per_installment;
+            $dps->total_installment      = $plan->total_installment;
+            $dps->given_installment      = 1;
+            $dps->installment_interval   = $plan->installment_interval;
+            $dps->delay_value            = $plan->delay_value;
+            $dps->charge_per_installment = $charge;
+            $dps->save();
 
-        Installment::saveInstallments($dps);
-        $nextInstallment           = $dps->nextInstallment()->first();
-        $nextInstallment->given_at = now();
-        $nextInstallment->save();
+            $user->balance -= $amount;
+            $user->save();
 
-        $transaction               = new Transaction();
-        $transaction->user_id      = $user->id;
-        $transaction->amount       = $amount;
-        $transaction->post_balance = $user->balance;
-        $transaction->charge       = 0;
-        $transaction->trx_type     = '-';
-        $transaction->details      = 'DPS installment given';
-        $transaction->trx          = $dps->dps_number;
-        $transaction->remark       = "dps_installment";
-        $transaction->save();
+            Installment::saveInstallments($dps);
+            $nextInstallment           = $dps->nextInstallment()->first();
+            $nextInstallment->given_at = now();
+            $nextInstallment->save();
 
-        $adminNotification            = new AdminNotification();
-        $adminNotification->user_id   = $user->id;
-        $adminNotification->title     = 'New DPS opened';
-        $adminNotification->click_url = urlPath('admin.dps.index') . '?search=' . $dps->dps_number;
-        $adminNotification->save();
+            $transaction               = new Transaction();
+            $transaction->user_id      = $user->id;
+            $transaction->amount       = $amount;
+            $transaction->post_balance = $user->balance;
+            $transaction->charge       = 0;
+            $transaction->trx_type     = '-';
+            $transaction->details      = 'DPS installment given';
+            $transaction->trx          = $dps->dps_number;
+            $transaction->remark       = "dps_installment";
+            $transaction->save();
 
-        session()->forget('otp');
-        session()->forget('otp_id');
+            $adminNotification            = new AdminNotification();
+            $adminNotification->user_id   = $user->id;
+            $adminNotification->title     = 'New DPS opened';
+            $adminNotification->click_url = urlPath('admin.dps.index') . '?search=' . $dps->dps_number;
+            $adminNotification->save();
 
-        $shortCodes                          = $dps->shortCodes();
-        $shortCodes['next_installment_date'] = now()->addDays($dps->installment_interval);
+            session()->forget('otp');
+            session()->forget('otp_id');
 
-        notify($user, 'DPS_OPENED', $shortCodes);
-        updateRewardPoint(Status::DPS_REWARD, $user, $amount, 'Reward Points for DPS Opened');
+            $shortCodes                          = $dps->shortCodes();
+            $shortCodes['next_installment_date'] = now()->addDays($dps->installment_interval);
 
-        $notify[] = ['success', 'DPS opened successfully'];
-        return to_route('user.dps.details', $dps->dps_number)->withNotify($notify);
+            notify($user, 'DPS_OPENED', $shortCodes);
+            updateRewardPoint(Status::DPS_REWARD, $user, $amount, 'Reward Points for DPS Opened');
+
+            $notify[] = ['success', 'DPS opened successfully'];
+            return to_route('user.dps.details', $dps->dps_number)->withNotify($notify);
+        });
     }
 
     public function installments($dpsNumber) {
@@ -143,48 +147,50 @@ class DpsController extends Controller {
     }
 
     public function withdraw($id) {
-        $dps = Dps::where('user_id', auth()->id())->with('plan')->findOrFail($id);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+            $dps = Dps::where('user_id', auth()->id())->with('plan')->lockForUpdate()->findOrFail($id);
 
-        if ($dps->status == Status::DPS_RUNNING) {
-            $notify[] = ['error', 'You can\'t withdraw a DPS before mature'];
+            if ($dps->status == Status::DPS_RUNNING) {
+                $notify[] = ['error', 'You can\'t withdraw a DPS before mature'];
+                return back()->withNotify($notify);
+            }
+
+            if ($dps->status == Status::DPS_CLOSED) {
+                $notify[] = ['error', 'You have already withdrawn the DPS amount'];
+                return back()->withNotify($notify);
+            }
+
+            $user        = \App\Models\User::where('id', auth()->id())->lockForUpdate()->first();
+            $dps->status = Status::DPS_CLOSED;
+            $dps->save();
+
+            $withdrawableAmount = $dps->withdrawableAmount();
+
+            $user->balance += $withdrawableAmount;
+            $user->save();
+
+            $transaction               = new Transaction();
+            $transaction->user_id      = $user->id;
+            $transaction->amount       = $withdrawableAmount;
+            $transaction->post_balance = $user->balance;
+            $transaction->charge       = 0;
+            $transaction->trx_type     = '+';
+            $transaction->details      = 'DPS mature amount received';
+            $transaction->remark       = 'dps_matured';
+            $transaction->trx          = getTrx();
+            $transaction->save();
+
+            $adminNotification            = new AdminNotification();
+            $adminNotification->user_id   = $user->id;
+            $adminNotification->title     = 'A matured DPS has been withdrawn';
+            $adminNotification->click_url = urlPath('admin.dps.index') . '?search=' . $dps->dps_number;
+            $adminNotification->save();
+
+            notify($user, 'DPS_CLOSED', $dps->shortCodes());
+
+            $notify[] = ['success', 'DPS closed successfully'];
             return back()->withNotify($notify);
-        }
-
-        if ($dps->status == Status::DPS_CLOSED) {
-            $notify[] = ['error', 'You have already withdrawn the DPS amount'];
-            return back()->withNotify($notify);
-        }
-
-        $user        = auth()->user();
-        $dps->status = Status::DPS_CLOSED;
-        $dps->save();
-
-        $withdrawableAmount = $dps->withdrawableAmount();
-
-        $user->balance += $withdrawableAmount;
-        $user->save();
-
-        $transaction               = new Transaction();
-        $transaction->user_id      = $user->id;
-        $transaction->amount       = $withdrawableAmount;
-        $transaction->post_balance = $user->balance;
-        $transaction->charge       = 0;
-        $transaction->trx_type     = '+';
-        $transaction->details      = 'DPS mature amount received';
-        $transaction->remark       = 'dps_matured';
-        $transaction->trx          = getTrx();
-        $transaction->save();
-
-        $adminNotification            = new AdminNotification();
-        $adminNotification->user_id   = $user->id;
-        $adminNotification->title     = 'A matured DPS has been withdrawn';
-        $adminNotification->click_url = urlPath('admin.dps.index') . '?search=' . $dps->dps_number;
-        $adminNotification->save();
-
-        notify($user, 'DPS_CLOSED', $dps->shortCodes());
-
-        $notify[] = ['success', 'DPS closed successfully'];
-        return back()->withNotify($notify);
+        });
     }
 
     private function validation($request, $plan) {

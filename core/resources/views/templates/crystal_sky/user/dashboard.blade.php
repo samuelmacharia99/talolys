@@ -33,7 +33,7 @@
         @endif
     @endif
 
-    @if (gs()->modules->virtual_card)
+    @if (@gs()->modules->virtual_card)
         @php
             $vcardContent = getContent('vcard_cta.content', true);
         @endphp
@@ -65,7 +65,7 @@
             </a>
         </div>
 
-        @if (gs()->modules->referral_system)
+        @if (@gs()->modules->referral_system)
             <div class="col-xl-8 col-lg-12 col-md-8 order-xl-0 order-lg-first order-md-0 order-sm-first">
                 <div class="dashboard-widget refer">
                     <div class="custom-border flex-align flex-between">
@@ -130,7 +130,7 @@
             </a>
         </div>
 
-        @if (gs()->modules->fdr)
+        @if (@gs()->modules->fdr)
             <div class="col-xl-4 col-lg-6 col-md-4 col-sm-6 col-xsm-6">
                 <a href="{{ route('user.fdr.list') }}?status={{ Status::FDR_RUNNING }}" class="d-block">
                     <div class="dashboard-widget">
@@ -145,7 +145,7 @@
                 </a>
             </div>
         @endif
-        @if (gs()->modules->dps)
+        @if (@gs()->modules->dps)
             <div class="col-xl-4 col-lg-6 col-md-4 col-sm-6 col-xsm-6">
                 <a href="{{ route('user.dps.list') }}?status={{ Status::FDR_RUNNING }}" class="d-block">
                     <div class="dashboard-widget">
@@ -161,7 +161,7 @@
             </div>
         @endif
 
-        @if (gs()->modules->loan)
+        @if (@gs()->modules->loan)
             <div class="col-xl-4 col-lg-12 col-md-4 col-sm-12 col-xsm-6">
                 <a href="{{ route('user.loan.list') }}?status={{ Status::LOAN_RUNNING }}" class="d-block">
                     <div class="dashboard-widget">

@@ -114,6 +114,7 @@ function getAmount($amount, $length = 2) {
 }
 
 function showAmount($amount, $decimal = 2, $separate = true, $exceptZeros = false, $currencyFormat = true, $walletCurrency = null) {
+    $amount = (float) ($amount ?? 0);
     $separator = '';
     if ($separate) {
         $separator = ',';
@@ -351,15 +352,15 @@ function verifyG2fa($user, $code, $secret = null) {
     if (!$secret) {
         $secret = $user->tsc;
     }
-    $oneCode  = $authenticator->getCode($secret);
-    $userCode = $code;
-    if ($oneCode == $userCode) {
+    if (!$secret || !$code) {
+        return false;
+    }
+    if ($authenticator->verifyCode($secret, $code, 2)) {
         $user->tv = Status::YES;
         $user->save();
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 function urlPath($routeName, $routeParam = null) {
@@ -480,8 +481,17 @@ function gs($key = null) {
         ]);
     }
 
-    if (!$general->modules) {
-        $general->modules = (object) [
+    if (!$general->modules || is_string($general->modules)) {
+        $modules = $general->modules;
+        if (is_string($modules)) {
+            $decoded = json_decode($modules);
+            // Handle accidental double-encoding from seeders
+            if (is_string($decoded)) {
+                $decoded = json_decode($decoded);
+            }
+            $modules = $decoded;
+        }
+        $general->modules = is_object($modules) ? $modules : (object) [
             'deposit'            => 1,
             'withdraw'           => 1,
             'dps'                => 1,

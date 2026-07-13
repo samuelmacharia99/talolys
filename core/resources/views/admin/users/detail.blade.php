@@ -460,9 +460,13 @@
 
 @can('admin.users.login')
     @push('breadcrumb-plugins')
-        <a href="{{ route('admin.users.login', $user->id) }}" target="_blank" class="btn btn-sm btn-outline--primary"><i
-                class="las la-sign-in-alt"></i>@lang('Login as User')</a>
+        <button type="button" class="btn btn-sm btn-outline--primary confirmationBtn"
+            data-question="@lang('Are you sure you want to login as this user? Your admin session will end.')"
+            data-action="{{ route('admin.users.login', $user->id) }}">
+            <i class="las la-sign-in-alt"></i>@lang('Login as User')
+        </button>
     @endpush
+    <x-confirmation-modal />
 @endcan
 
 @push('script')

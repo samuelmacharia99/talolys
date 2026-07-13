@@ -1,6 +1,6 @@
 @extends('Template::layouts.master')
 @section('content')
-    @if (gs()->modules->other_bank)
+    @if (@gs()->modules->other_bank)
         <div class="d-flex flex-wrap justify-content-end mb-3">
             <a class="btn btn-sm btn--dark" href="{{ route('user.beneficiary.other') }}"> <i class="la la-users"></i>
                 @lang('Manage Beneficiaries')</a>

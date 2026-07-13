@@ -1,4 +1,4 @@
-@if (gs()->modules->loan)
+@if (@gs()->modules->loan)
     @php
         $loanContent = getContent('loan_plans.content', true);
         try {

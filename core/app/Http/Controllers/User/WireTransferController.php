@@ -33,6 +33,10 @@ class WireTransferController extends Controller {
         $wireTransferSetting = WireTransferSetting::firstOrFail();
         $formProcessor       = new FormProcessor();
         $form                = Form::where('act', 'wire_transfer')->first();
+        if (!$form) {
+            $notify[] = ['error', 'The wire transfer form is not configured yet'];
+            return back()->withNotify($notify);
+        }
         $formData            = $form->form_data;
         $validationRule      = $formProcessor->valueValidation($formData);
         $validationRule      = mergeOtpField($validationRule);
@@ -51,65 +55,73 @@ class WireTransferController extends Controller {
     }
 
     public function confirm() {
-        $verification = OtpVerification::find(sessionVerificationId());
-        $setting      = $verification->verifiable;
-        $amount       = $verification->additional_data->amount;
-        $user         = auth()->user();
+        return \Illuminate\Support\Facades\DB::transaction(function () {
+            $verification = OtpVerification::find(sessionVerificationId());
+            $setting      = $verification->verifiable;
+            $amount       = $verification->additional_data->amount;
+            $user         = \App\Models\User::where('id', auth()->id())->lockForUpdate()->first();
 
-        OTPManager::checkVerificationData($verification, WireTransferSetting::class);
+            OTPManager::checkVerificationData($verification, WireTransferSetting::class);
+            OTPManager::markActionCompleted($verification);
 
-        $this->checkTransferAvailability($amount, $setting);
+            if (!$setting) {
+                $notify[] = ['error', 'Wire transfer is not configured yet'];
+                return to_route('user.home')->withNotify($notify);
+            }
 
-        $charge      = $this->charge($amount, $setting);
-        $finalAmount = $amount + $charge;
+            $this->checkTransferAvailability($amount, $setting);
 
-        $transfer                     = new BalanceTransfer();
-        $transfer->user_id            = $user->id;
-        $transfer->trx                = getTrx();
-        $transfer->beneficiary_id     = 0;
-        $transfer->amount             = $amount;
-        $transfer->charge             = $charge;
-        $transfer->status             = Status::TRANSFER_PENDING;
-        $transfer->wire_transfer_data = $verification->additional_data->application_form;
-        $transfer->save();
+            $charge      = $this->charge($amount, $setting);
+            $finalAmount = $amount + $charge;
 
-        $user->balance -= $finalAmount;
-        $user->save();
+            $transfer                     = new BalanceTransfer();
+            $transfer->user_id            = $user->id;
+            $transfer->trx                = getTrx();
+            $transfer->beneficiary_id     = 0;
+            $transfer->amount             = $amount;
+            $transfer->charge             = $charge;
+            $transfer->status             = Status::TRANSFER_PENDING;
+            $transfer->wire_transfer_data = $verification->additional_data->application_form;
+            $transfer->save();
 
-        $transaction               = new Transaction();
-        $transaction->user_id      = $user->id;
-        $transaction->amount       = $finalAmount;
-        $transaction->post_balance = $user->balance;
-        $transaction->charge       = $transfer->charge;
-        $transaction->trx_type     = '-';
-        $transaction->details      = 'Wire Transfer';
-        $transaction->trx          = $transfer->trx;
-        $transaction->remark       = "wire_transfer";
-        $transaction->save();
+            $user->balance -= $finalAmount;
+            $user->save();
 
-        $adminNotification            = new AdminNotification();
-        $adminNotification->user_id   = $user->id;
-        $adminNotification->title     = 'New wire transfer request';
-        $adminNotification->click_url = urlPath('admin.transfers.details', $transfer->id);
-        $adminNotification->save();
+            $transaction               = new Transaction();
+            $transaction->user_id      = $user->id;
+            $transaction->amount       = $finalAmount;
+            $transaction->post_balance = $user->balance;
+            $transaction->charge       = $transfer->charge;
+            $transaction->trx_type     = '-';
+            $transaction->details      = 'Wire Transfer';
+            $transaction->trx          = $transfer->trx;
+            $transaction->remark       = "wire_transfer";
+            $transaction->save();
 
-        session()->forget('otp_id');
+            $adminNotification            = new AdminNotification();
+            $adminNotification->user_id   = $user->id;
+            $adminNotification->title     = 'New wire transfer request';
+            $adminNotification->click_url = urlPath('admin.transfers.details', $transfer->id);
+            $adminNotification->save();
 
-        $accountName   = $transfer->wireTransferAccountName();
-        $accountNumber = $transfer->wireTransferAccountNumber();
+            session()->forget('otp_id');
 
-        notify($user, 'WIRE_TRANSFER_REQUEST_SEND', [
-            "sender_account_number"    => $transfer->user->account_number,
-            "sender_account_name"      => $transfer->user->username,
-            "recipient_account_number" => @$accountNumber->value,
-            "recipient_account_name"   => @$accountName->value,
-            "sending_amount"           => $transfer->amount,
-            "charge"                   => $transfer->charge,
-            "final_amount"             => $finalAmount,
-        ]);
+            $accountName   = $transfer->wireTransferAccountName();
+            $accountNumber = $transfer->wireTransferAccountNumber();
 
-        $notify[] = ['success', "Transfer request sent successfully"];
-        return to_route('user.transfer.details', $transfer->trx)->withNotify($notify);
+            notify($user, 'WIRE_TRANSFER_REQUEST_SEND', [
+                "sender_account_number"    => $transfer->user->account_number,
+                "sender_account_name"      => $transfer->user->username,
+                "recipient_account_number" => @$accountNumber->value,
+                "recipient_account_name"   => @$accountName->value,
+                "sending_amount"           => $transfer->amount,
+                "charge"                   => $transfer->charge,
+                "final_amount"             => $finalAmount,
+            ]);
+
+            $notify[] = ['success', "Transfer request sent successfully"];
+            return to_route('user.transfer.details', $transfer->trx)->withNotify($notify);
+        });
     }
 
     public function details($id) {
@@ -137,7 +149,6 @@ class WireTransferController extends Controller {
         $user        = auth()->user();
 
         if ($user->balance < $finalAmount) {
-            throw ValidationException::withMessages(['error' => 'Sorry! You don\'t have sufficient balance']);
             throw ValidationException::withMessages(['error' => 'Sorry! You don\'t have sufficient balance']);
         }
 

@@ -1,7 +1,7 @@
 @extends('Template::user.transfer.layout')
 @section('transfer-content')
     <div class="card custom--card overflow-hidden">
-        @if (gs()->modules->other_bank)
+        @if (@gs()->modules->other_bank)
             <div class="card-header">
                 <div class="header-nav mb-0">
                     <a class="btn btn-sm btn--dark" href="{{ route('user.beneficiary.other') }}"> <i class="la la-users"></i>

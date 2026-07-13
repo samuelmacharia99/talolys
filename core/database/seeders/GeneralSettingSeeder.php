@@ -42,7 +42,7 @@ class GeneralSettingSeeder extends Seeder
                 'registration'     => 1,
                 'agree'            => 0,
                 'multi_language'   => 1,
-                'modules'          => json_encode((object)[
+                'modules'          => (object)[
                     'deposit'            => 1,
                     'withdraw'           => 1,
                     'dps'                => 1,
@@ -60,7 +60,7 @@ class GeneralSettingSeeder extends Seeder
                     'wallet'             => 0,
                     'account_level'      => 0,
                     'reward_point'       => 0,
-                ]),
+                ],
             ])
         );
 

@@ -1,4 +1,4 @@
-@if (gs()->modules->dps)
+@if (@gs()->modules->dps)
     @php
         $content = getContent('dps_plans.content', true);
         try {

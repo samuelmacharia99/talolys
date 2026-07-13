@@ -87,8 +87,15 @@ class PaymentController extends Controller {
             abort(404);
         }
         $data = Deposit::where('id', $id)->where('status', Status::PAYMENT_INITIATE)->orderBy('id', 'DESC')->firstOrFail();
-        $user = User::findOrFail($data->user_id);
-        auth()->login($user);
+
+        // Only continue if the deposit owner is already authenticated — never auto-login from a hash.
+        if (!auth()->check() || (int) auth()->id() !== (int) $data->user_id) {
+            session()->put('Track', $data->trx);
+            session()->put('pending_deposit_confirm', $data->trx);
+            $notify[] = ['error', 'Please login to continue your deposit'];
+            return to_route('user.login')->withNotify($notify);
+        }
+
         session()->put('Track', $data->trx);
         return to_route('user.deposit.confirm');
     }
@@ -130,14 +137,24 @@ class PaymentController extends Controller {
 
 
     public static function userDataUpdate($deposit, $isManual = null) {
-        if ($deposit->status == Status::PAYMENT_INITIATE || $deposit->status == Status::PAYMENT_PENDING) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($deposit, $isManual) {
+            $deposit = Deposit::where('id', $deposit->id)->lockForUpdate()->first();
+
+            if (!$deposit || !in_array($deposit->status, [Status::PAYMENT_INITIATE, Status::PAYMENT_PENDING], true)) {
+                return;
+            }
+
             $deposit->status = Status::PAYMENT_SUCCESS;
             $deposit->save();
 
-            $user = User::find($deposit->user_id);
+            $user = User::where('id', $deposit->user_id)->lockForUpdate()->first();
+            if (!$user) {
+                return;
+            }
 
-            if($deposit->wallet_id) {
-                $wallet = $deposit->wallet;
+            $wallet = null;
+            if ($deposit->wallet_id) {
+                $wallet = Wallet::where('id', $deposit->wallet_id)->lockForUpdate()->first();
                 $walletAmount = $deposit->amount * $wallet->currency->currency_rate;
                 $wallet->balance += $walletAmount;
                 $wallet->save();
@@ -145,7 +162,6 @@ class PaymentController extends Controller {
                 $balance = $wallet->balance;
                 $deposit->wallet_amount = $walletAmount;
                 $deposit->save();
-
             } else {
                 $user->balance += $deposit->amount;
                 $user->save();
@@ -187,7 +203,7 @@ class PaymentController extends Controller {
                 'trx' => $deposit->trx,
                 'post_balance' => showAmount($balance, currencyFormat: false)
             ];
-            if($deposit->wallet_id) {
+            if ($deposit->wallet_id && $wallet) {
                 $notifyTemplate = $isManual ? 'WALLET_DEPOSIT_APPROVE' : 'WALLET_DEPOSIT_COMPLETE';
                 $notifyData['receive_amount'] = $deposit->amount * $wallet->currency->currency_rate;
                 $notifyData['receive_currency'] = $wallet->currency->currency;
@@ -195,15 +211,11 @@ class PaymentController extends Controller {
             notify($user, $notifyTemplate, $notifyData);
 
             if ($deposit->is_card_issue) {
-
                 self::completeVirtualCardIssuing($deposit);
             }
 
             if ($deposit->card_id && $deposit->is_topup) {
-
                 $virtualCard = VirtualCard::with('user')->find($deposit->card_id);
-
-
                 VirtualCardLib::updateCardForTopup($virtualCard, $deposit->topup_detail->amount, $deposit, false);
 
                 if ($deposit->is_topup) {
@@ -215,7 +227,7 @@ class PaymentController extends Controller {
             ReferralCommission::levelCommission($user, $deposit->amount, $deposit->trx);
             updateAccountLevel($user);
             updateRewardPoint(Status::DEPOSIT_REWARD, $user, $deposit->amount, 'Reward Points for deposit');
-        }
+        });
     }
 
     public function manualDepositConfirm() {

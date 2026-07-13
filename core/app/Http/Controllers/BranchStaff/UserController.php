@@ -89,7 +89,11 @@ class UserController extends Controller
         $this->validation($request);
         $kycData = null;
         if (gs('kv')) {
-            $form              = Form::where('act', 'kyc')->first();
+            $form = Form::where('act', 'kyc')->first();
+            if (!$form) {
+                $notify[] = ['error', 'KYC form is not configured yet'];
+                return back()->withNotify($notify)->withInput();
+            }
             $formData          = $form->form_data;
             $formProcessor     = new FormProcessor();
             $kycValidationRule = $formProcessor->valueValidation($formData);

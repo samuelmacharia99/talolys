@@ -6,10 +6,10 @@
             @if (auth()->user()?->ts)
                 <option value="2fa">@lang('Google Authenticator')</option>
             @endif
-            @if (gs()->modules->otp_email)
+            @if (@gs()->modules->otp_email)
                 <option value="email">@lang('Email')</option>
             @endif
-            @if (gs()->modules->otp_sms)
+            @if (@gs()->modules->otp_sms)
                 <option value="sms">@lang('SMS')</option>
             @endif
         </select>

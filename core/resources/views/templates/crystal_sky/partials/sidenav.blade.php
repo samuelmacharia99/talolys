@@ -13,7 +13,7 @@
                 </a>
             </li>
 
-            @if (gs()->modules->deposit)
+            @if (@gs()->modules->deposit)
                 <li class="sidebar-menu-list__item {{ menuActive('user.deposit.*') }}">
                     <a href="{{ route('user.deposit.history') }}" class="sidebar-menu-list__link">
                         <span class="icon"><i class="las la-file-invoice-dollar"></i></span>
@@ -31,7 +31,7 @@
                 </li>
             @endif
 
-            @if (gs()->modules->withdraw)
+            @if (@gs()->modules->withdraw)
                 <li class="sidebar-menu-list__item {{ menuActive('user.withdraw*') }}">
                     <a href="{{ route('user.withdraw.history') }}" class="sidebar-menu-list__link">
                         <span class="icon"><i class="las la-money-bill"></i></span>
@@ -40,7 +40,7 @@
                 </li>
             @endif
 
-            @if (gs()->modules->fdr)
+            @if (@gs()->modules->fdr)
                 <li class="sidebar-menu-list__item {{ menuActive('user.fdr.*') }}">
                     <a href="{{ route('user.fdr.list') }}" class="sidebar-menu-list__link">
                         <span class="icon"><i class="las la-file-invoice-dollar"></i></span>
@@ -49,7 +49,7 @@
                 </li>
             @endif
 
-            @if (gs()->modules->dps)
+            @if (@gs()->modules->dps)
                 <li class="sidebar-menu-list__item {{ menuActive('user.dps.*') }}">
                     <a href="{{ route('user.dps.list') }}" class="sidebar-menu-list__link">
                         <span class="icon"><i class="las la-piggy-bank"></i></span>
@@ -58,7 +58,7 @@
                 </li>
             @endif
 
-            @if (gs()->modules->loan)
+            @if (@gs()->modules->loan)
                 <li class="sidebar-menu-list__item {{ menuActive('user.loan.*') }}">
                     <a href="{{ route('user.loan.list') }}" class="sidebar-menu-list__link">
                         <span class="icon"><i class="las la-hand-holding-usd"></i></span>
@@ -76,7 +76,7 @@
                 </li>
             @endif
 
-            @if (gs()->modules->own_bank || gs()->modules->other_bank || gs()->modules->wire_transfer)
+            @if (@gs()->modules->own_bank || @gs()->modules->other_bank || @gs()->modules->wire_transfer)
                 <li class="sidebar-menu-list__item {{ menuActive(['user.transfer*', 'user.beneficiary.*']) }}">
 
                     <a href="{{ route('user.transfer.history') }}" class="sidebar-menu-list__link">
@@ -87,7 +87,7 @@
                 </li>
             @endif
 
-            @if (gs()->modules->virtual_card)
+            @if (@gs()->modules->virtual_card)
                 <li class="sidebar-menu-list__item {{ menuActive(['user.vcard.*', 'user.topup*']) }}">
 
                     <a href="{{ route('user.vcard.index') }}" class="sidebar-menu-list__link">
@@ -112,7 +112,7 @@
                 </a>
             </li>
 
-            @if (gs()->modules->referral_system)
+            @if (@gs()->modules->referral_system)
                 <li class="sidebar-menu-list__item {{ menuActive('user.referral.users') }}">
                     <a href="{{ route('user.referral.users') }}" class="sidebar-menu-list__link">
                         <span class="icon"><i class="las la-user-friends"></i></span>

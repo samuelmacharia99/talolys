@@ -71,7 +71,7 @@ Route::middleware('admin', 'adminPermission')->group(function () {
         Route::post('add-sub-balance/{id}', 'addSubBalance')->name('add.sub.balance');
         Route::get('send-notification/{id}', 'showNotificationSingleForm')->name('notification.single');
         Route::post('send-notification/{id}', 'sendNotificationSingle')->name('notification.single');
-        Route::get('login/{id}', 'login')->name('login');
+        Route::post('login/{id}', 'login')->name('login');
         Route::post('status/{id}', 'status')->name('status');
         Route::get('send-notification', 'showNotificationAllForm')->name('notification.all');
         Route::post('send-notification', 'sendNotificationAll')->name('notification.all.send');

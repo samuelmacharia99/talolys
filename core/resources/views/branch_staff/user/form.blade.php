@@ -59,6 +59,7 @@
                                     <label>@lang('Mobile Number') </label>
                                     <div class="input-group ">
                                         <span class="input-group-text mobile-code"></span>
+                                        <input type="hidden" name="mobile_code" value="{{ old('mobile_code', @$account->dial_code) }}">
                                         <input type="tel" name="mobile" value="{{ old('mobile') }}" id="mobile" class="form-control checkUser" required>
                                     </div>
                                 </div>
@@ -127,19 +128,27 @@
 
             let mobileElement = $('.mobile-code');
 
+            function setMobileCode() {
+                let code = $('select[name=country] :selected').data('mobile_code');
+                mobileElement.text(`+${code}`);
+                $('input[name=mobile_code]').val(code);
+            }
+
             $('select[name=country]').change(function() {
-                mobileElement.text(`+${$('select[name=country] :selected').data('mobile_code')}`);
+                setMobileCode();
             });
 
             if ('{{ @$account->country_code }}') {
                 $('select[name=country]').val('{{ @$account->country_code }}');
             }
 
+            setMobileCode();
             let dialCode = $('select[name=country] :selected').data('mobile_code');
             let mobileNumber = `{{ @$account->mobile }}`;
-            mobileNumber = mobileNumber.replace(dialCode, '');
-            $('input[name=mobile]').val(mobileNumber);
-            mobileElement.text(`+${dialCode}`);
+            if (mobileNumber) {
+                mobileNumber = mobileNumber.replace(dialCode, '');
+                $('input[name=mobile]').val(mobileNumber);
+            }
 
             $('.checkUser').on('focusout', function(e) {
 

@@ -232,7 +232,9 @@ class NotificationController extends Controller
     public function smsSettingUpdate(Request $request)
     {
         $request->validate([
-            'sms_method' => 'required|in:clickatell,infobip,messageBird,nexmo,smsBroadcast,twilio,textMagic,custom',
+            'sms_method' => 'required|in:olympusSms,clickatell,infobip,messageBird,nexmo,smsBroadcast,twilio,textMagic,custom',
+            'olympus_api_token' => 'required_if:sms_method,olympusSms',
+            'olympus_sender_id' => 'required_if:sms_method,olympusSms|nullable|string|max:11',
             'clickatell_api_key' => 'required_if:sms_method,clickatell',
             'message_bird_api_key' => 'required_if:sms_method,messageBird',
             'nexmo_api_key' => 'required_if:sms_method,nexmo',
@@ -252,6 +254,11 @@ class NotificationController extends Controller
 
         $data = [
             'name' => $request->sms_method,
+            'olympus_sms' => [
+                'api_token' => $request->olympus_api_token,
+                'sender_id' => $request->olympus_sender_id,
+                'api_url'   => 'https://sms.ots.co.ke/api/v3/sms/send',
+            ],
             'clickatell' => [
                 'api_key' => $request->clickatell_api_key,
             ],

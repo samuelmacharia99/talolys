@@ -43,6 +43,45 @@ class SmsGateway {
 	 */
 	public $config;
 
+	public function olympusSms() {
+		$credential = $this->config->olympus_sms ?? null;
+		$apiToken   = $credential->api_token ?? null;
+		$senderId   = $credential->sender_id ?: $this->from;
+		$apiUrl     = $credential->api_url ?: 'https://sms.ots.co.ke/api/v3/sms/send';
+
+		if (!$apiToken) {
+			throw new \Exception('Olympus SMS API token is not configured');
+		}
+
+		if (!$senderId) {
+			throw new \Exception('Olympus SMS sender ID is not configured');
+		}
+
+		$payload = json_encode([
+			'recipient' => $this->to,
+			'sender_id' => $senderId,
+			'type'      => 'plain',
+			'message'   => $this->message,
+		]);
+
+		$headers = [
+			'Authorization: Bearer ' . $apiToken,
+			'Content-Type: application/json',
+			'Accept: application/json',
+		];
+
+		$response = CurlRequest::curlPostContent($apiUrl, $payload, $headers);
+		$result   = json_decode($response);
+
+		if (!$result) {
+			throw new \Exception('Olympus SMS returned an invalid response');
+		}
+
+		if (($result->status ?? null) === 'error') {
+			throw new \Exception($result->message ?? 'Olympus SMS send failed');
+		}
+	}
+
 	public function clickatell() {
 		$message = urlencode($this->message);
 		$apiKey = $this->config->clickatell->api_key;

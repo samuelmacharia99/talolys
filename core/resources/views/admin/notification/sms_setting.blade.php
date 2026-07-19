@@ -12,7 +12,8 @@
                         <div class="form-group">
                             <label>@lang('Sms Send Method')</label>
                             <select name="sms_method" class="select2 form-control" data-minimum-results-for-search="-1">
-                               <option value="clickatell" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'clickatell') selected @endif>@lang('Clickatell')</option>
+                                <option value="olympusSms" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'olympusSms') selected @endif>@lang('Olympus SMS')</option>
+                                <option value="clickatell" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'clickatell') selected @endif>@lang('Clickatell')</option>
                                 <option value="infobip" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'infobip') selected @endif>@lang('Infobip')</option>
                                 <option value="messageBird" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'messageBird') selected @endif>@lang('Message Bird')</option>
                                 <option value="nexmo" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'nexmo') selected @endif>@lang('Nexmo')</option>
@@ -21,6 +22,35 @@
                                 <option value="textMagic" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'textMagic') selected @endif>@lang('Text Magic')</option>
                                 <option value="custom" @if (isset(gs('sms_config')->name) && gs('sms_config')->name == 'custom') selected @endif>@lang('Custom API')</option>
                             </select>
+                        </div>
+                        <div class="row mt-4 d-none configForm" id="olympusSms">
+                            <div class="col-md-12">
+                                <h6 class="mb-2">@lang('Olympus SMS Configuration')</h6>
+                                <p class="text-muted mb-3">@lang('Send SMS via Olympus SMS (sms.ots.co.ke). Use your API bearer token and approved sender ID.')</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@lang('API Token') </label>
+                                    <input type="text" class="form-control" placeholder="@lang('Bearer API Token')"
+                                        name="olympus_api_token"
+                                        value="{{ isset(gs('sms_config')->olympus_sms->api_token) ? gs('sms_config')->olympus_sms->api_token : '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@lang('Sender ID') </label>
+                                    <input type="text" class="form-control" placeholder="@lang('Max 11 characters')"
+                                        name="olympus_sender_id" maxlength="11"
+                                        value="{{ isset(gs('sms_config')->olympus_sms->sender_id) ? gs('sms_config')->olympus_sms->sender_id : '' }}">
+                                    <small class="text-muted">@lang('Alphanumeric sender ID or phone number with country code.')</small>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>@lang('API Endpoint') </label>
+                                    <input type="text" class="form-control" value="https://sms.ots.co.ke/api/v3/sms/send" readonly>
+                                </div>
+                            </div>
                         </div>
                         <div class="row mt-4 d-none configForm" id="clickatell">
                             <div class="col-md-12">
@@ -347,7 +377,7 @@
          var method = `{{ isset(gs('sms_config')->name) ? gs('sms_config')->name : '' }}`;
 
             if (!method) {
-                method = 'clickatell';
+                method = 'olympusSms';
             }
 
             smsMethod(method);

@@ -245,7 +245,10 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="headerFields">
-                                                @for ($i = 0; $i < count(gs('sms_config')->custom->headers->name); $i++)
+                                                @php
+                                                    $customHeaders = @gs('sms_config')->custom->headers->name ?? [];
+                                                @endphp
+                                                @for ($i = 0; $i < count($customHeaders); $i++)
                                                     <div class="row mt-3">
                                                         <div class="col-md-5">
                                                             <input type="text" name="custom_header_name[]"
@@ -280,7 +283,11 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="bodyFields">
-                                                @for ($i = 0; $i < count(gs('sms_config')->custom->body->name); $i++)
+                                                @php
+                                                    $customBody = @gs('sms_config')->custom->body->name ?? [];
+                                                    $customBody = is_array($customBody) ? $customBody : (array) $customBody;
+                                                @endphp
+                                                @for ($i = 0; $i < count($customBody); $i++)
                                                     <div class="row mt-3">
                                                         <div class="col-md-5">
                                                             <input type="text" name="custom_body_name[]"

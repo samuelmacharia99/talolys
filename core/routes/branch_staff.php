@@ -63,4 +63,17 @@ Route::middleware('branch.staff')->group(function () {
     Route::get('deposits', 'DepositController@deposits')->name('deposits');
     Route::get('withdrawals', 'WithdrawController@withdrawals')->name('withdrawals');
     Route::get('transactions', 'BranchStaffController@transactions')->name('transactions');
+
+    Route::middleware('checkModule:loan')->controller('LoanController')->name('loan.')->group(function () {
+        Route::get('loans', 'list')->name('list');
+        Route::get('loans/details/{loanNumber}', 'details')->name('details');
+        Route::get('loans/instalments/{loanNumber}', 'installments')->name('installments');
+
+        Route::middleware('checkAccountOfficer')->group(function () {
+            Route::get('accounts/{accountNumber}/loans/plans', 'plans')->name('plans');
+            Route::post('accounts/{accountNumber}/loans/apply/{planId}', 'applyAmount')->name('apply.amount');
+            Route::get('loans/application-form', 'applyForm')->name('apply.form');
+            Route::post('loans/apply-confirm', 'confirm')->name('apply.confirm');
+        });
+    });
 });

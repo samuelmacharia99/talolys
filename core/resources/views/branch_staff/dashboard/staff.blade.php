@@ -17,6 +17,13 @@
                             </div>
                         </div>
                     </form>
+                    @if (@gs()->modules->loan)
+                        <p class="mb-0 mt-2">
+                            <a href="{{ route('staff.loan.list') }}" class="btn btn-sm btn-outline--primary">
+                                <i class="las la-file-invoice-dollar"></i> @lang('View Loan Applications')
+                            </a>
+                        </p>
+                    @endif
                 </div>
             </div>
         </div>

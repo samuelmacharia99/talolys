@@ -27,6 +27,14 @@ class Loan extends Model {
         return $this->belongsTo(LoanPlan::class, 'plan_id', 'id');
     }
 
+    public function branch() {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    public function branchStaff() {
+        return $this->belongsTo(BranchStaff::class, 'branch_staff_id');
+    }
+
     public function installments() {
         return $this->morphMany(Installment::class, 'installmentable');
     }

@@ -17,7 +17,12 @@
 
     <h5 class="mt-5 mb-3 d-flex justify-content-between">
         @lang('Latest Transactions')
-        <a href="{{ route('staff.transactions') }}" class="btn btn-outline--primary">@lang('View All')</a>
+        <span class="d-flex gap-2">
+            @if (@gs()->modules->loan)
+                <a href="{{ route('staff.loan.list') }}" class="btn btn-outline--primary">@lang('Loans')</a>
+            @endif
+            <a href="{{ route('staff.transactions') }}" class="btn btn-outline--primary">@lang('View All')</a>
+        </span>
     </h5>
 
     <div class="card b-radius--10">

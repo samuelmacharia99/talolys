@@ -200,6 +200,11 @@
         <button class="btn btn--danger btn--shadow withdraw-btn" data-action="{{ route('staff.withdraw.save', $user->account_number) }}">
             <i class="las la-minus-circle"></i> @lang('Withdraw Money')
         </button>
+        @if (@gs()->modules->loan)
+            <a class="btn btn--primary btn--shadow" href="{{ route('staff.loan.plans', $user->account_number) }}">
+                <i class="las la-file-invoice-dollar"></i> @lang('Apply Loan')
+            </a>
+        @endif
         <a class="btn btn--info btn--shadow"  href="{{ route('staff.account.statement',$user->account_number) }}">
             <i class="las la-cloud-download-alt"></i> @lang('Statement')
         </a>

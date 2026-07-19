@@ -52,6 +52,15 @@
                     </a>
                 </li>
 
+                @if (@gs()->modules->loan)
+                    <li class="sidebar-menu-item {{ menuActive(['staff.loan.list', 'staff.loan.details', 'staff.loan.installments', 'staff.loan.plans', 'staff.loan.apply.form']) }}">
+                        <a class="nav-link" href="{{ route('staff.loan.list') }}">
+                            <i class="menu-icon las la-file-invoice-dollar"></i>
+                            <span class="menu-title">@lang('Loans')</span>
+                        </a>
+                    </li>
+                @endif
+
                 @if (isManager())
                     <li class="sidebar-menu-item {{ menuActive('staff.branches') }}">
                         <a class="nav-link" href="{{ route('staff.branches') }}">
